@@ -787,6 +787,7 @@ function Contact() {
         >
           CONTACT
         </div>
+
         <h2
           className="mb-8"
           style={{
@@ -800,6 +801,7 @@ function Contact() {
           <br />
           <span style={{ color: "#3b82f6" }}>SOMETHING SOLID</span>
         </h2>
+
         <p
           className="mb-10 max-w-lg mx-auto"
           style={{
@@ -809,11 +811,12 @@ function Contact() {
             color: "rgba(148,163,184,0.6)",
           }}
         >
-          Looking for an Application Designer who thinks in systems,
-          not just screens? Let&apos;s talk.
+          Looking for an Application Designer who thinks in systems, not just
+          screens? Let&apos;s talk.
         </p>
+
         <a
-          href="t_naveen@outlook.in"
+          href="mailto:t_naveen@outlook.in"
           className="inline-flex items-center gap-3 px-10 py-4 rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
           style={{
             fontFamily: "var(--font-mono)",
@@ -826,6 +829,19 @@ function Contact() {
         >
           GET IN TOUCH →
         </a>
+
+        {/* visible email */}
+        <p
+          style={{
+            marginTop: 16,
+            fontFamily: "var(--font-mono)",
+            fontSize: 11,
+            letterSpacing: "0.08em",
+            color: "rgba(148,163,184,0.45)",
+          }}
+        >
+          t_naveen@outlook.in
+        </p>
 
         {/* Footer */}
         <div
@@ -842,6 +858,7 @@ function Contact() {
           >
             © 2025 NAVEEN
           </span>
+
           <Link
             href="/creator"
             className="transition-colors duration-300 hover:text-amber-400"

@@ -515,22 +515,7 @@ function Projects() {
       gradient: "linear-gradient(135deg, rgba(239,68,68,0.12), rgba(139,92,246,0.08))",
       accent: "#ef4444",
     },
-    {
-      title: "Kala Bhairava Episode",
-      tag: "FEATURED EPISODE",
-      desc: "Dramatic cinematic sequence featuring Kala Bhairava and Kali Mata. Dark, powerful visuals with authentic mythological depth.",
-      tech: ["AI Cinema", "VFX", "Mythology", "Storytelling"],
-      gradient: "linear-gradient(135deg, rgba(245,158,11,0.1), rgba(139,92,246,0.12))",
-      accent: "#f59e0b",
-    },
-    {
-      title: "Sacred Bow — Lanka Episode",
-      tag: "FEATURED EPISODE",
-      desc: "Hanuman's epic journey to Lanka. Cinematic aerial sequences, divine encounters, and battle choreography — all AI-generated.",
-      tech: ["AI Cinema", "Action", "Mythology", "Visual FX"],
-      gradient: "linear-gradient(135deg, rgba(239,68,68,0.1), rgba(245,158,11,0.1))",
-      accent: "#ef4444",
-    },
+   
     {
       title: "AI Pre-Production Studio",
       tag: "B2B SERVICES",
@@ -846,6 +831,8 @@ function Studio() {
 
 // ── Connect ────────────────────────────────────────────────
 function Connect() {
+  const email = "hello@aiwithnobrain.com";
+
   return (
     <section
       id="connect"
@@ -867,6 +854,7 @@ function Connect() {
         >
           CONNECT
         </div>
+
         <h2
           className="mb-8"
           style={{
@@ -888,6 +876,7 @@ function Connect() {
             SOMETHING EPIC
           </span>
         </h2>
+
         <p
           className="mb-10 max-w-lg mx-auto"
           style={{
@@ -897,11 +886,13 @@ function Connect() {
             color: "rgba(254,243,199,0.45)",
           }}
         >
-          Collaboration on mythology content, AI-powered cinema
-          pre-production, or just want to talk about storytelling?
+          Collaboration on mythology content, AI-powered cinema pre-production,
+          or just want to talk about storytelling?
         </p>
+
+        {/* CTA */}
         <a
-          href="mailto:aiwithnobrain@gmail.com"
+          href={`mailto:${email}`}
           className="inline-flex items-center gap-3 px-10 py-4 rounded-full transition-all duration-300 hover:-translate-y-0.5"
           style={{
             fontFamily: "var(--font-mono)",
@@ -916,6 +907,31 @@ function Connect() {
         >
           SAY HELLO →
         </a>
+
+        {/* Email line (THIS is where your <p> goes) */}
+        <p
+          style={{
+            marginTop: 16,
+            fontFamily: "var(--font-mono)",
+            fontSize: 11,
+            letterSpacing: "0.08em",
+            color: "rgba(254,243,199,0.35)",
+          }}
+        >
+          {email}
+        </p>
+
+        {/* Optional micro-copy (looks pro, remove if you want) */}
+        <p
+          style={{
+            marginTop: 10,
+            fontFamily: "var(--font-body)",
+            fontSize: 13,
+            color: "rgba(254,243,199,0.28)",
+          }}
+        >
+          Usually replies within 24–48 hours.
+        </p>
 
         {/* Footer */}
         <div
@@ -932,6 +948,7 @@ function Connect() {
           >
             © 2025 NAVEEN • AIWITHNOBRAIN • ZEROORIGINS
           </span>
+
           <Link
             href="/professional"
             className="transition-colors duration-300 hover:text-blue-400"
@@ -950,6 +967,7 @@ function Connect() {
     </section>
   );
 }
+
 
 // ── Page ───────────────────────────────────────────────────
 export default function CreatorPage() {
