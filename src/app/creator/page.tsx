@@ -1,6 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import CursorThemeSetter from "@/components/CursorThemeSetter";
 
 // ── Typed Text ─────────────────────────────────────────────
 function TypedText({ texts }: { texts: string[] }) {
@@ -48,45 +50,90 @@ function TypedText({ texts }: { texts: string[] }) {
 // ── Social Sidebar ─────────────────────────────────────────
 function SocialSidebar() {
   const links = [
-    { icon: "YT", label: "YouTube" },
-    { icon: "IG", label: "Instagram" },
-    { icon: "X", label: "Twitter" },
-    { icon: "GH", label: "GitHub" },
+    {
+      icon: (
+        // YouTube play-button SVG
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+        </svg>
+      ),
+      label: "YouTube",
+      href: "https://www.youtube.com/@AIwithnobrain?sub_confirmation=1",
+      color: "#ff0000",
+    },
+    {
+      icon: (
+        // Instagram gradient circle SVG
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      ),
+      label: "Instagram",
+      href: "https://www.instagram.com/aiwithnobrain",
+      color: "#e1306c",
+    },
+    {
+      icon: (
+        // X (Twitter) SVG
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      ),
+      label: "Twitter / X",
+      href: "https://x.com/aiwithnobrain",
+      color: "#ffffff",
+    },
+    {
+      icon: (
+        // Globe / website SVG
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      ),
+      label: "AIwithNoBrain.com",
+      href: "https://www.aiwithnobrain.com",
+      color: "#f59e0b",
+    },
   ];
+
   return (
-    <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-5 z-50">
+    <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50">
       {links.map((l) => (
         <a
           key={l.label}
-          href="#"
+          href={l.href}
+          target="_blank"
+          rel="noopener noreferrer"
           title={l.label}
           className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
           style={{
-            border: "1px solid rgba(245,158,11,0.2)",
-            color: "rgba(245,158,11,0.5)",
-            fontFamily: "var(--font-mono)",
-            fontSize: 10,
+            border: `1px solid ${l.color}30`,
+            color: `${l.color}70`,
             textDecoration: "none",
-            background: "rgba(245,158,11,0.03)",
+            background: `${l.color}06`,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#f59e0b";
-            e.currentTarget.style.color = "#fbbf24";
-            e.currentTarget.style.boxShadow = "0 0 25px rgba(245,158,11,0.3)";
+            e.currentTarget.style.borderColor = l.color;
+            e.currentTarget.style.color = l.color;
+            e.currentTarget.style.boxShadow = `0 0 20px ${l.color}40`;
+            e.currentTarget.style.background = `${l.color}12`;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(245,158,11,0.2)";
-            e.currentTarget.style.color = "rgba(245,158,11,0.5)";
+            e.currentTarget.style.borderColor = `${l.color}30`;
+            e.currentTarget.style.color = `${l.color}70`;
             e.currentTarget.style.boxShadow = "none";
+            e.currentTarget.style.background = `${l.color}06`;
           }}
         >
           {l.icon}
         </a>
       ))}
       <div
-        className="w-[1px] h-14 mx-auto"
+        className="w-[1px] h-12 mx-auto mt-1"
         style={{
-          background: "linear-gradient(to bottom, rgba(245,158,11,0.25), transparent)",
+          background: "linear-gradient(to bottom, rgba(245,158,11,0.3), transparent)",
         }}
       />
     </div>
@@ -126,18 +173,40 @@ function Navbar() {
       >
         ← NAVEEN
       </Link>
-      <div
+      {/* Centre brand — clickable to aiwithnobrain.com */}
+      <a
+        href="https://www.aiwithnobrain.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="transition-all duration-300"
         style={{
           fontFamily: "var(--font-mono)",
           fontSize: 11,
-          color: "rgba(168,137,107,0.4)",
-          letterSpacing: "0.1em",
+          color: "rgba(245,158,11,0.45)",
+          letterSpacing: "0.12em",
+          textDecoration: "none",
+          border: "1px solid rgba(245,158,11,0.15)",
+          padding: "4px 12px",
+          borderRadius: 99,
+          background: "rgba(245,158,11,0.04)",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b";
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.5)";
+          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.08)";
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 16px rgba(245,158,11,0.2)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,0.45)";
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.15)";
+          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.04)";
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
         }}
       >
-        AIWITHNOBRAIN
-      </div>
+        ↗ AIWITHNOBRAIN.COM
+      </a>
       <div className="flex gap-9">
-        {["story", "projects", "studio", "connect"].map((s) => (
+        {["story", "projects", "connect"].map((s) => (
           <a
             key={s}
             href={`#${s}`}
@@ -156,6 +225,424 @@ function Navbar() {
         ))}
       </div>
     </nav>
+  );
+}
+
+// ── Aperture Mandala (hero centerpiece) ────────────────────
+function ApertureMandala({ mouse }: { mouse: { x: number; y: number } }) {
+  // 8 aperture blades, each rotated 45° apart
+  const blades = Array.from({ length: 8 }, (_, i) => i);
+
+  return (
+    <div
+      className="absolute top-1/2 left-1/2 pointer-events-none select-none"
+      style={{
+        transform: `translate(calc(-50% + ${mouse.x * 0.06}px), calc(-50% + ${mouse.y * 0.06}px))`,
+        transition: "transform 0.35s cubic-bezier(0.25,0.1,0.25,1)",
+        zIndex: 5,
+      }}
+    >
+      {/* ── Outermost orbit ring: Sanskrit / brand text ── */}
+      <div
+        className="absolute"
+        style={{
+          width: 420,
+          height: 420,
+          top: "50%",
+          left: "50%",
+          marginTop: -210,
+          marginLeft: -210,
+          animation: "mandala-spin-slow 60s linear infinite",
+        }}
+      >
+        <svg width="420" height="420" viewBox="0 0 420 420">
+          <defs>
+            <path
+              id="orbitPath"
+              d="M 210,210 m -195,0 a 195,195 0 1,1 390,0 a 195,195 0 1,1 -390,0"
+            />
+          </defs>
+          <text
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.22em",
+              fill: "rgba(245,158,11,0.35)",
+            }}
+          >
+            <textPath href="#orbitPath">
+              ॐ&nbsp;&nbsp;WHERE&nbsp;AI&nbsp;MEETS&nbsp;IMAGINATION&nbsp;&nbsp;•&nbsp;&nbsp;AI&nbsp;RAMAYANAM&nbsp;&nbsp;•&nbsp;&nbsp;STOP&nbsp;THINKING&nbsp;START&nbsp;CREATING&nbsp;&nbsp;•&nbsp;&nbsp;ZERO&nbsp;ORIGINS&nbsp;&nbsp;•&nbsp;&nbsp;AIWITHNOBRAIN&nbsp;&nbsp;•&nbsp;&nbsp;
+            </textPath>
+          </text>
+        </svg>
+      </div>
+
+      {/* ── Middle orbit ring: dashed, counter-rotating ── */}
+      <div
+        className="absolute rounded-full"
+        style={{
+          width: 340,
+          height: 340,
+          top: "50%",
+          left: "50%",
+          marginTop: -170,
+          marginLeft: -170,
+          border: "1px dashed rgba(239,68,68,0.18)",
+          animation: "mandala-spin-rev 35s linear infinite",
+        }}
+      >
+        {/* 6 small red planet dots on this ring */}
+        {[0, 60, 120, 180, 240, 300].map((deg) => (
+          <div
+            key={deg}
+            className="absolute"
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: deg % 120 === 0 ? "#ef4444" : "#f59e0b",
+              boxShadow: `0 0 8px ${deg % 120 === 0 ? "#ef4444" : "#f59e0b"}`,
+              top: `calc(50% + ${Math.sin((deg * Math.PI) / 180) * 170 - 2.5}px)`,
+              left: `calc(50% + ${Math.cos((deg * Math.PI) / 180) * 170 - 2.5}px)`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* ── Inner ring: solid amber, slow spin ── */}
+      <div
+        className="absolute rounded-full"
+        style={{
+          width: 256,
+          height: 256,
+          top: "50%",
+          left: "50%",
+          marginTop: -128,
+          marginLeft: -128,
+          border: "1px solid rgba(245,158,11,0.22)",
+          animation: "mandala-spin-slow 40s linear infinite",
+        }}
+      >
+        {/* Single bright amber tracer dot */}
+        <div
+          className="absolute"
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: "50%",
+            background: "#f59e0b",
+            boxShadow: "0 0 16px 4px rgba(245,158,11,0.6)",
+            top: -3.5,
+            left: "calc(50% - 3.5px)",
+          }}
+        />
+      </div>
+
+      {/* ── Aperture iris: 8 blades ── */}
+      <div
+        className="absolute"
+        style={{
+          width: 200,
+          height: 200,
+          top: "50%",
+          left: "50%",
+          marginTop: -100,
+          marginLeft: -100,
+          animation: "aperture-spin 20s linear infinite",
+        }}
+      >
+        {blades.map((i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              width: "100%",
+              height: "100%",
+              top: 0,
+              left: 0,
+              transform: `rotate(${i * 45}deg)`,
+            }}
+          >
+            {/* Each blade: an ellipse clipped to look like a camera shutter blade */}
+            <div
+              style={{
+                position: "absolute",
+                width: 72,
+                height: 100,
+                top: 0,
+                left: "calc(50% - 36px)",
+                borderRadius: "50% 50% 10% 10%",
+                background:
+                  i % 2 === 0
+                    ? "linear-gradient(180deg, rgba(245,158,11,0.13) 0%, rgba(245,158,11,0.04) 100%)"
+                    : "linear-gradient(180deg, rgba(239,68,68,0.09) 0%, rgba(139,92,246,0.04) 100%)",
+                border: `1px solid ${i % 2 === 0 ? "rgba(245,158,11,0.18)" : "rgba(239,68,68,0.12)"}`,
+                transformOrigin: "50% 100%",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ── Core glow disc ── */}
+      <div
+        className="absolute rounded-full"
+        style={{
+          width: 110,
+          height: 110,
+          top: "50%",
+          left: "50%",
+          marginTop: -55,
+          marginLeft: -55,
+          background:
+            "radial-gradient(circle at 38% 38%, rgba(255,220,120,0.22) 0%, rgba(245,158,11,0.08) 50%, transparent 80%)",
+          boxShadow:
+            "0 0 60px rgba(245,158,11,0.28), 0 0 120px rgba(239,68,68,0.10), inset 0 0 30px rgba(255,200,100,0.08)",
+          animation: "core-pulse 4s ease-in-out infinite",
+        }}
+      />
+
+      {/* ── Center: lens aperture SVG icon ── */}
+      <div
+        className="absolute"
+        style={{
+          width: 72,
+          height: 72,
+          top: "50%",
+          left: "50%",
+          marginTop: -36,
+          marginLeft: -36,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Camera aperture / diaphragm SVG */}
+        <svg
+          width="60"
+          height="60"
+          viewBox="0 0 60 60"
+          style={{ animation: "aperture-spin-rev 12s linear infinite" }}
+        >
+          <defs>
+            <radialGradient id="lensGrad" cx="40%" cy="35%" r="60%">
+              <stop offset="0%" stopColor="#ffd080" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#92400e" stopOpacity="0.3" />
+            </radialGradient>
+          </defs>
+          {/* Outer circle */}
+          <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(245,158,11,0.4)" strokeWidth="1" />
+          {/* 6 aperture petal paths */}
+          {[0,60,120,180,240,300].map((deg) => (
+            <g key={deg} transform={`rotate(${deg} 30 30)`}>
+              <ellipse
+                cx="30"
+                cy="12"
+                rx="8"
+                ry="14"
+                fill="url(#lensGrad)"
+                opacity="0.55"
+              />
+            </g>
+          ))}
+          {/* Inner lens circle */}
+          <circle cx="30" cy="30" r="10" fill="none" stroke="rgba(245,158,11,0.6)" strokeWidth="1.5" />
+          <circle
+            cx="30"
+            cy="30"
+            r="5"
+            fill="rgba(255,220,120,0.7)"
+            style={{ filter: "blur(1px)" }}
+          />
+        </svg>
+      </div>
+
+      {/* ── Twin-portal brand links below the mandala ── */}
+      <div
+        className="absolute"
+        style={{
+          top: "calc(50% + 128px)",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 10,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {/* Thin divider line above */}
+        <div style={{ width: 1, height: 18, background: "linear-gradient(to bottom, transparent, rgba(245,158,11,0.25))" }} />
+
+        {/* Two pills side by side */}
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          {/* AIwithNoBrain — amber */}
+          <a
+            href="https://www.aiwithnobrain.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.2em",
+              color: "rgba(245,158,11,0.6)",
+              textDecoration: "none",
+              border: "1px solid rgba(245,158,11,0.2)",
+              padding: "5px 12px",
+              borderRadius: 99,
+              background: "rgba(245,158,11,0.04)",
+              transition: "all 0.3s",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.color = "#f59e0b";
+              el.style.borderColor = "rgba(245,158,11,0.5)";
+              el.style.background = "rgba(245,158,11,0.09)";
+              el.style.boxShadow = "0 0 18px rgba(245,158,11,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.color = "rgba(245,158,11,0.6)";
+              el.style.borderColor = "rgba(245,158,11,0.2)";
+              el.style.background = "rgba(245,158,11,0.04)";
+              el.style.boxShadow = "none";
+            }}
+          >
+            {/* YT icon tiny */}
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+            </svg>
+            AIWITHNOBRAIN
+          </a>
+
+          {/* Dot separator */}
+          <span style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(254,243,199,0.12)", flexShrink: 0 }} />
+
+          {/* ZeroOrigins — purple */}
+          <a
+            href="https://www.zeroorigins.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.2em",
+              color: "rgba(139,92,246,0.6)",
+              textDecoration: "none",
+              border: "1px solid rgba(139,92,246,0.2)",
+              padding: "5px 12px",
+              borderRadius: 99,
+              background: "rgba(139,92,246,0.04)",
+              transition: "all 0.3s",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+            }}
+            onMouseEnter={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.color = "#8b5cf6";
+              el.style.borderColor = "rgba(139,92,246,0.5)";
+              el.style.background = "rgba(139,92,246,0.09)";
+              el.style.boxShadow = "0 0 18px rgba(139,92,246,0.25)";
+            }}
+            onMouseLeave={(e) => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.color = "rgba(139,92,246,0.6)";
+              el.style.borderColor = "rgba(139,92,246,0.2)";
+              el.style.background = "rgba(139,92,246,0.04)";
+              el.style.boxShadow = "none";
+            }}
+          >
+            {/* Atom / SaaS icon */}
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" strokeOpacity="0.4"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" strokeOpacity="0.7"/>
+            </svg>
+            ZEROORIGINS
+          </a>
+        </div>
+
+        {/* Shared micro-tagline */}
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 8,
+            letterSpacing: "0.18em",
+            color: "rgba(254,243,199,0.15)",
+          }}
+        >
+          AI · CONTENT · SAAS · MUSIC
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Cinematic Ticker ────────────────────────────────────────
+function CinematicTicker() {
+  const items = [
+    "● AIWITHNOBRAIN.COM",
+    "▶ @AIWITHNOBRAIN ON YOUTUBE",
+    "◆ AI RAMAYANAM: WAR OF DHARMA",
+    "● WHERE AI MEETS IMAGINATION",
+    "▶ ZEROORIGINS.IN",
+    "◆ AI · SAAS · BUILDER COMMUNITY",
+    "● STOP THINKING · START CREATING",
+    "▶ AI MUSIC · SONIC MYTHOLOGY",
+    "◆ 27 EPISODES · VERTICAL CINEMA",
+    "● FROM THOUGHT TO THUNDER",
+    "▶ ZERO ORIGINS · BUILD WITH AI",
+  ];
+  // Duplicate for seamless loop
+  const full = [...items, ...items];
+
+  return (
+    <div
+      className="absolute bottom-0 left-0 right-0 overflow-hidden"
+      style={{
+        borderTop: "1px solid rgba(245,158,11,0.08)",
+        borderBottom: "1px solid rgba(245,158,11,0.04)",
+        background: "rgba(245,158,11,0.02)",
+        height: 36,
+        display: "flex",
+        alignItems: "center",
+        zIndex: 10,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: 60,
+          animation: "ticker-scroll 40s linear infinite",
+          whiteSpace: "nowrap",
+          paddingLeft: 60,
+        }}
+      >
+        {full.map((item, i) => (
+          <span
+            key={i}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              letterSpacing: "0.22em",
+              color:
+                item.startsWith("▶")
+                  ? "rgba(239,68,68,0.55)"
+                  : item.startsWith("◆")
+                  ? "rgba(139,92,246,0.55)"
+                  : "rgba(245,158,11,0.5)",
+            }}
+          >
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -178,14 +665,12 @@ function Hero() {
       className="min-h-screen flex items-center relative overflow-hidden"
       style={{ background: "#0a0606" }}
     >
-      {/* Multi-color ambient blobs */}
+      {/* ── Ambient colour blobs ── */}
       <div
         className="absolute w-[700px] h-[700px] rounded-full opacity-60"
         style={{
-          background:
-            "radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 60%)",
-          top: "10%",
-          left: "20%",
+          background: "radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 60%)",
+          top: "10%", left: "18%",
           transform: `translate(${mouse.x * 0.3}px, ${mouse.y * 0.3}px)`,
           transition: "transform 0.4s ease",
         }}
@@ -193,10 +678,8 @@ function Hero() {
       <div
         className="absolute w-[500px] h-[500px] rounded-full opacity-50"
         style={{
-          background:
-            "radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 60%)",
-          bottom: "5%",
-          right: "10%",
+          background: "radial-gradient(circle, rgba(239,68,68,0.06) 0%, transparent 60%)",
+          bottom: "8%", right: "8%",
           transform: `translate(${mouse.x * -0.2}px, ${mouse.y * -0.2}px)`,
           transition: "transform 0.4s ease",
         }}
@@ -204,67 +687,17 @@ function Hero() {
       <div
         className="absolute w-[400px] h-[400px] rounded-full opacity-40"
         style={{
-          background:
-            "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 60%)",
-          top: "50%",
-          right: "30%",
+          background: "radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 60%)",
+          top: "50%", right: "28%",
           transform: `translate(${mouse.x * 0.15}px, ${mouse.y * 0.15}px)`,
           transition: "transform 0.4s ease",
         }}
       />
 
-      {/* Center Orb */}
-      <div
-        className="absolute top-1/2 left-1/2 pointer-events-none"
-        style={{
-          transform: `translate(calc(-50% + ${mouse.x * 0.08}px), calc(-50% + ${mouse.y * 0.08}px))`,
-          transition: "transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)",
-        }}
-      >
-        <div
-          className="w-48 h-48 rounded-full relative"
-          style={{
-            background:
-              "radial-gradient(circle at 35% 35%, #ffd080, #d4a040 40%, #8b5e1a 80%, #3d2600)",
-            boxShadow: `
-              0 0 80px rgba(245,158,11,0.35),
-              0 0 160px rgba(239,68,68,0.15),
-              inset 0 -20px 40px rgba(0,0,0,0.4),
-              inset 0 10px 30px rgba(255,220,150,0.3)
-            `,
-          }}
-        >
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none"
-            style={{
-              fontSize: 52,
-              color: "rgba(255,240,200,0.65)",
-              fontFamily: "serif",
-              textShadow: "0 0 30px rgba(255,200,100,0.5)",
-            }}
-          >
-            ॐ
-          </div>
-        </div>
-        {/* Ring */}
-        <div
-          className="absolute top-1/2 left-1/2 w-72 h-72 -mt-36 -ml-36 rounded-full"
-          style={{
-            border: "1px solid rgba(245,158,11,0.1)",
-            animation: "spin 25s linear infinite",
-          }}
-        >
-          <div
-            className="absolute -top-1 left-1/2 w-2 h-2 rounded-full"
-            style={{
-              background: "#f59e0b",
-              boxShadow: "0 0 12px #f59e0b",
-            }}
-          />
-        </div>
-      </div>
+      {/* ── Aperture Mandala (new centerpiece) ── */}
+      <ApertureMandala mouse={mouse} />
 
-      {/* Left text */}
+      {/* ── Left text ── */}
       <div className="absolute left-20 top-1/2 -translate-y-1/2 z-10">
         <div
           className="mb-3"
@@ -299,9 +732,44 @@ function Hero() {
         >
           CREATOR • STORYTELLER • BUILDER
         </div>
+
+        {/* YouTube subscribe pill */}
+        <a
+          href="https://www.youtube.com/@AIwithnobrain?sub_confirmation=1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full transition-all duration-300"
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 9,
+            letterSpacing: "0.18em",
+            border: "1px solid rgba(255,0,0,0.3)",
+            color: "rgba(255,100,100,0.7)",
+            textDecoration: "none",
+            background: "rgba(255,0,0,0.05)",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#ff4444";
+            (e.currentTarget as HTMLAnchorElement).style.color = "#ff6666";
+            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 20px rgba(255,0,0,0.2)";
+            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.09)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,0,0,0.3)";
+            (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,100,100,0.7)";
+            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.05)";
+          }}
+        >
+          {/* YT icon */}
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+          </svg>
+          SUBSCRIBE ON YOUTUBE
+        </a>
       </div>
 
-      {/* Right text */}
+      {/* ── Right text ── */}
       <div className="absolute right-20 top-1/2 -translate-y-1/2 text-right z-10">
         <div
           className="mb-2"
@@ -342,20 +810,70 @@ function Hero() {
             ]}
           />
         </div>
+
+        {/* ZeroOrigins + Music sub-line — faint, right-aligned */}
+        <div
+          className="mt-5"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 6,
+          }}
+        >
+          {/* Thin rule */}
+          <div style={{ width: 40, height: 1, background: "rgba(139,92,246,0.25)" }} />
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <a
+              href="https://www.zeroorigins.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 9,
+                letterSpacing: "0.18em",
+                color: "rgba(139,92,246,0.5)",
+                textDecoration: "none",
+                transition: "color 0.3s",
+              }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8b5cf6"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(139,92,246,0.5)"; }}
+            >
+              ↗ ZEROORIGINS.IN
+            </a>
+            <span style={{ color: "rgba(254,243,199,0.1)", fontSize: 8 }}>·</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.15em", color: "rgba(239,68,68,0.35)" }}>
+              AI MUSIC
+            </span>
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 8,
+              letterSpacing: "0.14em",
+              color: "rgba(254,243,199,0.12)",
+            }}
+          >
+            LEARN · BUILD · CREATE
+          </div>
+        </div>
       </div>
 
-      {/* Background watermark */}
+      {/* ── Background watermark ── */}
       <div
         className="absolute -bottom-5 left-0 w-full text-center select-none whitespace-nowrap"
         style={{
           fontFamily: "var(--font-display)",
           fontSize: "clamp(4rem, 12vw, 12rem)",
-          color: "rgba(245,158,11,0.02)",
+          color: "rgba(245,158,11,0.015)",
           letterSpacing: "0.05em",
         }}
       >
         ZERO ORIGINS
       </div>
+
+      {/* ── Cinematic ticker strip at the very bottom ── */}
+      <CinematicTicker />
     </section>
   );
 }
@@ -518,8 +1036,8 @@ function Projects() {
    
     {
       title: "AI Pre-Production Studio",
-      tag: "B2B SERVICES",
-      desc: "Offering storyboarding, concept art, and pre-visualization services for Indian cinema. Packages from ₹15K to ₹2.5L.",
+      tag: "PASSION PROJECT",
+      desc: "Exploring AI-assisted storyboarding, concept art, and pre-visualization for cinematic storytelling — applied hands-on to every episode of AI Ramayanam.",
       tech: ["Storyboarding", "Concept Art", "Pre-Viz", "Cinema"],
       gradient: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(239,68,68,0.08))",
       accent: "#8b5cf6",
@@ -636,198 +1154,6 @@ function Projects() {
   );
 }
 
-// ── Studio Services ────────────────────────────────────────
-function Studio() {
-  const tiers = [
-    {
-      name: "Starter",
-      price: "₹15,000",
-      desc: "Perfect for indie creators and small projects",
-      features: [
-        "5 AI-generated concept frames",
-        "Basic storyboard (10 scenes)",
-        "1 revision round",
-        "Standard delivery (7 days)",
-      ],
-    },
-    {
-      name: "Professional",
-      price: "₹75,000",
-      desc: "For production houses and serious content",
-      features: [
-        "25 cinematic concept frames",
-        "Full storyboard (40+ scenes)",
-        "Character consistency guide",
-        "3 revision rounds",
-        "Priority delivery (5 days)",
-      ],
-      featured: true,
-    },
-    {
-      name: "Enterprise",
-      price: "₹2,50,000",
-      desc: "Full pre-production for feature films",
-      features: [
-        "100+ concept frames",
-        "Complete pre-visualization",
-        "Character & world bible",
-        "Unlimited revisions",
-        "Dedicated project manager",
-        "Express delivery (3 days)",
-      ],
-    },
-  ];
-
-  return (
-    <section
-      id="studio"
-      className="py-32 px-10 md:px-20 relative"
-      style={{ background: "#080505" }}
-    >
-      <div className="max-w-5xl mx-auto">
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.3em",
-            color: "#8b5cf6",
-            marginBottom: 20,
-          }}
-        >
-          AI PRE-PRODUCTION STUDIO
-        </div>
-        <h2
-          className="mb-6"
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(2rem, 5vw, 4rem)",
-            color: "#fef3c7",
-            lineHeight: 1.1,
-          }}
-        >
-          B2B Studio Services
-        </h2>
-        <p
-          className="mb-16 max-w-2xl"
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: 16,
-            lineHeight: 1.8,
-            color: "rgba(254,243,199,0.4)",
-          }}
-        >
-          AI-powered pre-production for Indian cinema. From storyboards to
-          cinematic concept art — everything a production house needs before
-          cameras roll.
-        </p>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {tiers.map((t) => (
-            <div
-              key={t.name}
-              className="p-8 rounded-xl transition-all duration-500 hover:-translate-y-1"
-              style={{
-                background: t.featured
-                  ? "linear-gradient(135deg, rgba(245,158,11,0.08), rgba(139,92,246,0.06))"
-                  : "rgba(255,255,255,0.01)",
-                border: t.featured
-                  ? "1px solid rgba(245,158,11,0.2)"
-                  : "1px solid rgba(255,255,255,0.04)",
-                boxShadow: t.featured
-                  ? "0 0 60px rgba(245,158,11,0.08)"
-                  : "none",
-              }}
-            >
-              {t.featured && (
-                <div
-                  className="mb-4 inline-block px-3 py-1 rounded-full"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 9,
-                    letterSpacing: "0.2em",
-                    background: "rgba(245,158,11,0.15)",
-                    color: "#f59e0b",
-                  }}
-                >
-                  POPULAR
-                </div>
-              )}
-              <div
-                className="mb-2"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.15em",
-                  color: "rgba(254,243,199,0.5)",
-                }}
-              >
-                {t.name.toUpperCase()}
-              </div>
-              <div
-                className="mb-4"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 40,
-                  color: t.featured ? "#f59e0b" : "#fef3c7",
-                  lineHeight: 1,
-                }}
-              >
-                {t.price}
-              </div>
-              <p
-                className="mb-6"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 13,
-                  color: "rgba(254,243,199,0.35)",
-                  lineHeight: 1.6,
-                }}
-              >
-                {t.desc}
-              </p>
-              <ul className="space-y-3 mb-8">
-                {t.features.map((f) => (
-                  <li
-                    key={f}
-                    className="flex items-start gap-2"
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: 13,
-                      color: "rgba(254,243,199,0.5)",
-                    }}
-                  >
-                    <span
-                      className="mt-1.5 w-1 h-1 rounded-full shrink-0"
-                      style={{ background: t.featured ? "#f59e0b" : "rgba(254,243,199,0.3)" }}
-                    />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="#connect"
-                className="block text-center py-3 rounded-full transition-all duration-300"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.15em",
-                  textDecoration: "none",
-                  background: t.featured
-                    ? "linear-gradient(135deg, #f59e0b, #ef4444)"
-                    : "transparent",
-                  color: t.featured ? "#0a0606" : "rgba(254,243,199,0.5)",
-                  border: t.featured ? "none" : "1px solid rgba(254,243,199,0.1)",
-                }}
-              >
-                GET STARTED
-              </a>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // ── Connect ────────────────────────────────────────────────
 function Connect() {
@@ -852,7 +1178,7 @@ function Connect() {
             marginBottom: 20,
           }}
         >
-          CONNECT
+          A CREATIVE SIDE
         </div>
 
         <h2
@@ -864,7 +1190,7 @@ function Connect() {
             lineHeight: 1.05,
           }}
         >
-          LET&apos;S CREATE
+          BUILT ON
           <br />
           <span
             style={{
@@ -873,12 +1199,12 @@ function Connect() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            SOMETHING EPIC
+            PURE PASSION
           </span>
         </h2>
 
         <p
-          className="mb-10 max-w-lg mx-auto"
+          className="mb-4 max-w-lg mx-auto"
           style={{
             fontFamily: "var(--font-body)",
             fontSize: 16,
@@ -886,52 +1212,63 @@ function Connect() {
             color: "rgba(254,243,199,0.45)",
           }}
         >
-          Collaboration on mythology content, AI-powered cinema pre-production,
-          or just want to talk about storytelling?
+          This is my creative universe — mythology, AI filmmaking, music, and
+          building in public. Not a side hustle, not a business pitch.
+          Just what I love doing outside of work.
         </p>
 
-        {/* CTA */}
-        <a
-          href={`mailto:${email}`}
-          className="inline-flex items-center gap-3 px-10 py-4 rounded-full transition-all duration-300 hover:-translate-y-0.5"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 12,
-            letterSpacing: "0.15em",
-            background: "linear-gradient(135deg, #f59e0b, #ef4444)",
-            color: "#0a0606",
-            fontWeight: 600,
-            textDecoration: "none",
-            boxShadow: "0 0 40px rgba(245,158,11,0.2)",
-          }}
-        >
-          SAY HELLO →
-        </a>
-
-        {/* Email line (THIS is where your <p> goes) */}
         <p
+          className="mb-10 max-w-lg mx-auto"
           style={{
-            marginTop: 16,
-            fontFamily: "var(--font-mono)",
-            fontSize: 11,
-            letterSpacing: "0.08em",
-            color: "rgba(254,243,199,0.35)",
-          }}
-        >
-          {email}
-        </p>
-
-        {/* Optional micro-copy (looks pro, remove if you want) */}
-        <p
-          style={{
-            marginTop: 10,
             fontFamily: "var(--font-body)",
-            fontSize: 13,
-            color: "rgba(254,243,199,0.28)",
+            fontSize: 15,
+            lineHeight: 1.8,
+            color: "rgba(254,243,199,0.3)",
           }}
         >
-          Usually replies within 24–48 hours.
+          If you&apos;re into AI, storytelling, or mythology — let&apos;s talk.
         </p>
+
+        {/* CTA row — YouTube first, email second */}
+        <div className="flex flex-col items-center gap-4">
+          <a
+            href="https://www.youtube.com/@AIwithnobrain?sub_confirmation=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-10 py-4 rounded-full transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              letterSpacing: "0.15em",
+              background: "linear-gradient(135deg, #cc0000, #ef4444)",
+              color: "#fff",
+              fontWeight: 600,
+              textDecoration: "none",
+              boxShadow: "0 0 40px rgba(239,68,68,0.2)",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+            </svg>
+            WATCH ON YOUTUBE
+          </a>
+
+          <a
+            href={`mailto:${email}`}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              color: "rgba(254,243,199,0.3)",
+              textDecoration: "none",
+              transition: "color 0.3s",
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,0.7)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(254,243,199,0.3)"; }}
+          >
+            or say hi → {email}
+          </a>
+        </div>
 
         {/* Footer */}
         <div
@@ -944,9 +1281,36 @@ function Connect() {
               fontSize: 10,
               color: "rgba(254,243,199,0.2)",
               letterSpacing: "0.1em",
+              display: "flex",
+              gap: 6,
+              alignItems: "center",
             }}
           >
-            © 2025 NAVEEN • AIWITHNOBRAIN • ZEROORIGINS
+            <span>© 2025 NAVEEN</span>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <a
+              href="https://www.aiwithnobrain.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "rgba(245,158,11,0.4)", textDecoration: "none", transition: "color 0.3s" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,0.4)"; }}
+            >
+              AIWITHNOBRAIN
+            </a>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <a
+              href="https://www.zeroorigins.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "rgba(139,92,246,0.4)", textDecoration: "none", transition: "color 0.3s" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8b5cf6"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(139,92,246,0.4)"; }}
+            >
+              ZEROORIGINS
+            </a>
+            <span style={{ opacity: 0.3 }}>•</span>
+            <span style={{ color: "rgba(239,68,68,0.35)" }}>MUSIC</span>
           </span>
 
           <Link
@@ -970,15 +1334,16 @@ function Connect() {
 
 
 // ── Page ───────────────────────────────────────────────────
+
 export default function CreatorPage() {
   return (
     <main style={{ background: "#0a0606" }}>
+      <CursorThemeSetter />
       <Navbar />
       <SocialSidebar />
       <Hero />
       <Story />
       <Projects />
-      <Studio />
       <Connect />
     </main>
   );

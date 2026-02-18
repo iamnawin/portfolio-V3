@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import CursorThemeSetter from "@/components/CursorThemeSetter";
 
 // ── Typed Text ─────────────────────────────────────────────
 function TypedText({ texts }: { texts: string[] }) {
@@ -300,8 +301,8 @@ function About() {
           <div className="grid grid-cols-2 gap-6">
             {[
               { num: "6+", label: "Years Experience" },
-              { num: "50+", label: "Projects Delivered" },
-              { num: "3", label: "Platform Certifications" },
+              { num: "13+", label: "Projects Delivered" },
+              { num: "8", label: "Platform Certifications" },
               { num: "∞", label: "Problems to Solve" },
             ].map((s) => (
               <div
@@ -346,25 +347,25 @@ function About() {
 function Experience() {
   const jobs = [
     {
-      role: "Application Solutions Designer",
+      role: "Technical Business Analyst & Solutions Architect",
       company: "Current Position",
-      period: "2023 — Present",
-      desc: "Designing and architecting enterprise applications with AI-augmented workflows. Leading system integrations across Salesforce, automation platforms, and custom solutions.",
-      tech: ["Salesforce", "Apex", "LWC", "Integration", "AI Automation"],
+      period: "Present",
+      desc: "Designing and architecting enterprise applications with Business workflows. Leading system integrations across Salesforce, automation platforms, and custom solutions.",
+      tech: ["Salesforce", "ServiceNOW", "CoPilot", "Integration", "AI Automation"],
     },
     {
       role: "Senior Salesforce Developer",
       company: "Enterprise Client",
-      period: "2021 — 2023",
+      period: "2023 — 2024",
       desc: "Built complex Lightning Web Components, Apex solutions, and automated business processes. Managed incident workflows and case management systems.",
       tech: ["Apex", "LWC", "Flows", "REST API", "Platform Events"],
     },
     {
       role: "Salesforce Developer",
       company: "Technology Firm",
-      period: "2018 — 2021",
-      desc: "Full-cycle Salesforce development from requirements to deployment. Created custom objects, triggers, batch processes, and Lightning components.",
-      tech: ["Apex", "Visualforce", "SOQL", "Lightning", "Admin"],
+      period: "2019 — 2023",
+      desc: "Full-cycle Salesforce development from requirements to deployment. ChatBots, Created custom objects, triggers, batch processes, and Lightning components.",
+      tech: ["Apex", "Visualforce", "SOQL", "Chat Agents", "Admin"],
     },
   ];
 
@@ -515,6 +516,7 @@ function Skills() {
         "AI Agent Orchestration",
         "Prompt Engineering",
         "Intelligent Document Processing",
+        "RAG Concepts & Implementation",
         "Custom AI Integrations",
       ],
     },
@@ -631,19 +633,13 @@ function Projects() {
       color: "#8b5cf6",
     },
     {
-      title: "AI-Augmented Workflow Engine",
-      desc: "n8n-based automation platform integrating AI agents for document processing, lead scoring, and intelligent data enrichment.",
+      title: "Customer ChatBot Agents",
+      desc: "automation platform integrating AI agents for document processing, lead scoring, and intelligent data enrichment.",
       tech: ["n8n", "AI Agents", "Automation", "Integration"],
       color: "#a855f7",
     },
     {
-      title: "Drivour — Route Discovery App",
-      desc: "Open-source React Native mobile app that shows interesting stops along driving routes, not just the fastest path. Location-based discovery engine.",
-      tech: ["React Native", "Maps API", "Mobile", "Open Source"],
-      color: "#3b82f6",
-    },
-    {
-      title: "Customer 360 Data Architecture",
+      title: "Loan Lifecycle Management",
       desc: "Unified data model across Sales, Service, and Marketing clouds. Custom objects, relationships, and roll-up summaries for complete customer visibility.",
       tech: ["Data Model", "SOQL", "Admin", "Reports"],
       color: "#6366f1",
@@ -882,6 +878,7 @@ function Contact() {
 export default function ProfessionalPage() {
   return (
     <main style={{ background: "#0b1120" }}>
+      <CursorThemeSetter />
       <Navbar />
       <Hero />
       <About />

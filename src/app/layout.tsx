@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Naveen | AI-Driven Application Designer & Cinematic Creator",
@@ -26,7 +27,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-black text-white overflow-x-hidden">{children}</body>
+
+      <body className="bg-black text-white overflow-x-hidden">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
