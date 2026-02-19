@@ -99,50 +99,84 @@ function SocialSidebar() {
   ];
 
   return (
-    <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50">
-      {links.map((l) => (
-        <a
-          key={l.label}
-          href={l.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={l.label}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
+    <>
+      {/* Desktop: fixed left sidebar */}
+      <div className="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 flex-col gap-4 z-50">
+        {links.map((l) => (
+          <a
+            key={l.label}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={l.label}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
+            style={{
+              border: `1px solid ${l.color}30`,
+              color: `${l.color}70`,
+              textDecoration: "none",
+              background: `${l.color}06`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = l.color;
+              e.currentTarget.style.color = l.color;
+              e.currentTarget.style.boxShadow = `0 0 20px ${l.color}40`;
+              e.currentTarget.style.background = `${l.color}12`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = `${l.color}30`;
+              e.currentTarget.style.color = `${l.color}70`;
+              e.currentTarget.style.boxShadow = "none";
+              e.currentTarget.style.background = `${l.color}06`;
+            }}
+          >
+            {l.icon}
+          </a>
+        ))}
+        <div
+          className="w-[1px] h-12 mx-auto mt-1"
           style={{
-            border: `1px solid ${l.color}30`,
-            color: `${l.color}70`,
-            textDecoration: "none",
-            background: `${l.color}06`,
+            background: "linear-gradient(to bottom, rgba(245,158,11,0.3), transparent)",
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = l.color;
-            e.currentTarget.style.color = l.color;
-            e.currentTarget.style.boxShadow = `0 0 20px ${l.color}40`;
-            e.currentTarget.style.background = `${l.color}12`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = `${l.color}30`;
-            e.currentTarget.style.color = `${l.color}70`;
-            e.currentTarget.style.boxShadow = "none";
-            e.currentTarget.style.background = `${l.color}06`;
-          }}
-        >
-          {l.icon}
-        </a>
-      ))}
+        />
+      </div>
+
+      {/* Mobile: fixed bottom bar */}
       <div
-        className="w-[1px] h-12 mx-auto mt-1"
+        className="flex md:hidden fixed bottom-0 left-0 right-0 z-50 justify-center gap-5 py-3 px-6"
         style={{
-          background: "linear-gradient(to bottom, rgba(245,158,11,0.3), transparent)",
+          background: "rgba(10,6,6,0.92)",
+          backdropFilter: "blur(16px)",
+          borderTop: "1px solid rgba(245,158,11,0.08)",
         }}
-      />
-    </div>
+      >
+        {links.map((l) => (
+          <a
+            key={l.label}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={l.label}
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              border: `1px solid ${l.color}30`,
+              color: `${l.color}70`,
+              textDecoration: "none",
+              background: `${l.color}06`,
+            }}
+          >
+            {l.icon}
+          </a>
+        ))}
+      </div>
+    </>
   );
 }
 
 // ── Nav ────────────────────────────────────────────────────
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", h);
@@ -150,81 +184,165 @@ function Navbar() {
   }, []);
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-10 py-5"
-      style={{
-        background: scrolled ? "rgba(10,6,6,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        borderBottom: scrolled
-          ? "1px solid rgba(245,158,11,0.06)"
-          : "1px solid transparent",
-        transition: "all 0.3s ease",
-      }}
-    >
-      <Link
-        href="/"
+    <>
+      <nav
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-5 md:px-10 py-4 md:py-5"
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: 22,
-          color: "#f59e0b",
-          letterSpacing: "0.05em",
-          textDecoration: "none",
+          background: scrolled || menuOpen ? "rgba(10,6,6,0.95)" : "transparent",
+          backdropFilter: scrolled || menuOpen ? "blur(20px)" : "none",
+          borderBottom: scrolled || menuOpen
+            ? "1px solid rgba(245,158,11,0.06)"
+            : "1px solid transparent",
+          transition: "all 0.3s ease",
         }}
       >
-        ← NAVEEN
-      </Link>
-      {/* Centre brand — clickable to aiwithnobrain.com */}
-      <a
-        href="https://www.aiwithnobrain.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-all duration-300"
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          color: "rgba(245,158,11,0.45)",
-          letterSpacing: "0.12em",
-          textDecoration: "none",
-          border: "1px solid rgba(245,158,11,0.15)",
-          padding: "4px 12px",
-          borderRadius: 99,
-          background: "rgba(245,158,11,0.04)",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b";
-          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.5)";
-          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.08)";
-          (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 16px rgba(245,158,11,0.2)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,0.45)";
-          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.15)";
-          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.04)";
-          (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
-        }}
-      >
-        ↗ AIWITHNOBRAIN.COM
-      </a>
-      <div className="flex gap-9">
-        {["story", "projects", "connect"].map((s) => (
+        <Link
+          href="/"
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: 20,
+            color: "#f59e0b",
+            letterSpacing: "0.05em",
+            textDecoration: "none",
+          }}
+        >
+          ← NAVEEN
+        </Link>
+
+        {/* Centre brand — hidden on mobile */}
+        <a
+          href="https://www.aiwithnobrain.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden md:block transition-all duration-300"
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 11,
+            color: "rgba(245,158,11,0.45)",
+            letterSpacing: "0.12em",
+            textDecoration: "none",
+            border: "1px solid rgba(245,158,11,0.15)",
+            padding: "4px 12px",
+            borderRadius: 99,
+            background: "rgba(245,158,11,0.04)",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.color = "#f59e0b";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.5)";
+            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.08)";
+            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 16px rgba(245,158,11,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLAnchorElement).style.color = "rgba(245,158,11,0.45)";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,158,11,0.15)";
+            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(245,158,11,0.04)";
+            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+          }}
+        >
+          ↗ AIWITHNOBRAIN.COM
+        </a>
+
+        {/* Desktop nav links */}
+        <div className="hidden md:flex gap-9">
+          {["story", "projects", "connect"].map((s) => (
+            <a
+              key={s}
+              href={`#${s}`}
+              className="hover:text-amber-400 transition-colors duration-300"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                color: "rgba(168,137,107,0.5)",
+                textDecoration: "none",
+                textTransform: "uppercase",
+              }}
+            >
+              {s}
+            </a>
+          ))}
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex flex-col gap-1.5 p-2"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{ background: "none", border: "none", cursor: "pointer" }}
+          aria-label="Toggle menu"
+        >
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              style={{
+                display: "block",
+                width: 22,
+                height: 1.5,
+                background: "#f59e0b",
+                borderRadius: 2,
+                transition: "all 0.3s ease",
+                transformOrigin: "center",
+                transform:
+                  menuOpen
+                    ? i === 0
+                      ? "translateY(5px) rotate(45deg)"
+                      : i === 2
+                      ? "translateY(-5px) rotate(-45deg)"
+                      : "opacity(0) scaleX(0)"
+                    : "none",
+                opacity: menuOpen && i === 1 ? 0 : 1,
+              }}
+            />
+          ))}
+        </button>
+      </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div
+          className="md:hidden fixed top-[60px] left-0 right-0 z-[99] flex flex-col gap-0"
+          style={{
+            background: "rgba(10,6,6,0.97)",
+            backdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(245,158,11,0.08)",
+          }}
+        >
+          {["story", "projects", "connect"].map((s) => (
+            <a
+              key={s}
+              href={`#${s}`}
+              onClick={() => setMenuOpen(false)}
+              className="px-6 py-4"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+                letterSpacing: "0.22em",
+                color: "rgba(168,137,107,0.7)",
+                textDecoration: "none",
+                textTransform: "uppercase",
+                borderBottom: "1px solid rgba(245,158,11,0.04)",
+              }}
+            >
+              {s}
+            </a>
+          ))}
           <a
-            key={s}
-            href={`#${s}`}
-            className="hover:text-amber-400 transition-colors duration-300"
+            href="https://www.aiwithnobrain.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-4"
             style={{
               fontFamily: "var(--font-mono)",
               fontSize: 11,
-              letterSpacing: "0.18em",
-              color: "rgba(168,137,107,0.5)",
+              letterSpacing: "0.15em",
+              color: "rgba(245,158,11,0.5)",
               textDecoration: "none",
-              textTransform: "uppercase",
             }}
           >
-            {s}
+            ↗ AIWITHNOBRAIN.COM
           </a>
-        ))}
-      </div>
-    </nav>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -694,18 +812,185 @@ function Hero() {
         }}
       />
 
-      {/* ── Aperture Mandala (new centerpiece) ── */}
-      <ApertureMandala mouse={mouse} />
+      {/* ── Aperture Mandala — desktop only as absolute centrepiece ── */}
+      <div className="hidden md:block">
+        <ApertureMandala mouse={mouse} />
+      </div>
 
-      {/* ── Left text ── */}
-      <div className="absolute left-20 top-1/2 -translate-y-1/2 z-10">
+      {/* ── Desktop layout: absolute left/right text ── */}
+      <>
+        {/* Left text — desktop */}
+        <div className="hidden md:block absolute left-20 top-1/2 -translate-y-1/2 z-10">
+          <div
+            className="mb-3"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 16,
+              fontWeight: 300,
+              color: "rgba(254,243,199,0.4)",
+            }}
+          >
+            Hello! I&apos;m
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+              color: "#fef3c7",
+              lineHeight: 1,
+              letterSpacing: "0.02em",
+            }}
+          >
+            NAVEEN
+          </div>
+          <div
+            className="mt-3"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              letterSpacing: "0.25em",
+              color: "rgba(245,158,11,0.5)",
+            }}
+          >
+            CREATOR • STORYTELLER • BUILDER
+          </div>
+          <a
+            href="https://www.youtube.com/@AIwithnobrain?sub_confirmation=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full transition-all duration-300"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.18em",
+              border: "1px solid rgba(255,0,0,0.3)",
+              color: "rgba(255,100,100,0.7)",
+              textDecoration: "none",
+              background: "rgba(255,0,0,0.05)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "#ff4444";
+              (e.currentTarget as HTMLAnchorElement).style.color = "#ff6666";
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 20px rgba(255,0,0,0.2)";
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.09)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,0,0,0.3)";
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,100,100,0.7)";
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.05)";
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+            </svg>
+            SUBSCRIBE ON YOUTUBE
+          </a>
+        </div>
+
+        {/* Right text — desktop */}
+        <div className="hidden md:block absolute right-20 top-1/2 -translate-y-1/2 text-right z-10">
+          <div
+            className="mb-2"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 15,
+              fontWeight: 300,
+              color: "rgba(254,243,199,0.3)",
+            }}
+          >
+            An
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(1.4rem, 3vw, 2.8rem)",
+              color: "rgba(245,158,11,0.2)",
+              lineHeight: 1.1,
+            }}
+          >
+            AI CINEMATIC
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(1.6rem, 3.5vw, 3.2rem)",
+              color: "#fef3c7",
+              lineHeight: 1.1,
+              minHeight: 44,
+            }}
+          >
+            <TypedText
+              texts={[
+                "MYTHOLOGY STORYTELLER",
+                "CINEMATIC CREATOR",
+                "AI FILMMAKER",
+                "CONTENT ALCHEMIST",
+              ]}
+            />
+          </div>
+          <div
+            className="mt-5"
+            style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}
+          >
+            <div style={{ width: 40, height: 1, background: "rgba(139,92,246,0.25)" }} />
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <a
+                href="https://www.zeroorigins.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 9,
+                  letterSpacing: "0.18em",
+                  color: "rgba(139,92,246,0.5)",
+                  textDecoration: "none",
+                  transition: "color 0.3s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8b5cf6"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(139,92,246,0.5)"; }}
+              >
+                ↗ ZEROORIGINS.IN
+              </a>
+              <span style={{ color: "rgba(254,243,199,0.1)", fontSize: 8 }}>·</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.15em", color: "rgba(239,68,68,0.35)" }}>
+                AI MUSIC
+              </span>
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 8,
+                letterSpacing: "0.14em",
+                color: "rgba(254,243,199,0.12)",
+              }}
+            >
+              LEARN · BUILD · CREATE
+            </div>
+          </div>
+        </div>
+      </>
+
+      {/* ── Mobile layout: stacked, centered column ── */}
+      <div
+        className="md:hidden w-full flex flex-col items-center text-center z-10 px-6 pb-24"
+        style={{ paddingTop: "88px" }}
+      >
+        {/* Scaled-down mandala */}
         <div
-          className="mb-3"
+          className="relative mb-6"
+          style={{ width: 200, height: 200, flexShrink: 0 }}
+        >
+          <ApertureMandala mouse={{ x: 0, y: 0 }} />
+        </div>
+
+        <div
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: 16,
+            fontSize: 13,
             fontWeight: 300,
             color: "rgba(254,243,199,0.4)",
+            marginBottom: 4,
           }}
         >
           Hello! I&apos;m
@@ -713,7 +998,7 @@ function Hero() {
         <div
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(2.5rem, 5vw, 4.5rem)",
+            fontSize: "clamp(2.8rem, 13vw, 4.5rem)",
             color: "#fef3c7",
             lineHeight: 1,
             letterSpacing: "0.02em",
@@ -722,62 +1007,26 @@ function Hero() {
           NAVEEN
         </div>
         <div
-          className="mt-3"
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: 10,
-            letterSpacing: "0.25em",
+            fontSize: 9,
+            letterSpacing: "0.2em",
             color: "rgba(245,158,11,0.5)",
+            marginTop: 8,
+            marginBottom: 16,
           }}
         >
           CREATOR • STORYTELLER • BUILDER
         </div>
 
-        {/* YouTube subscribe pill */}
-        <a
-          href="https://www.youtube.com/@AIwithnobrain?sub_confirmation=1"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full transition-all duration-300"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 9,
-            letterSpacing: "0.18em",
-            border: "1px solid rgba(255,0,0,0.3)",
-            color: "rgba(255,100,100,0.7)",
-            textDecoration: "none",
-            background: "rgba(255,0,0,0.05)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "#ff4444";
-            (e.currentTarget as HTMLAnchorElement).style.color = "#ff6666";
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 20px rgba(255,0,0,0.2)";
-            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.09)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,0,0,0.3)";
-            (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,100,100,0.7)";
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
-            (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,0,0,0.05)";
-          }}
-        >
-          {/* YT icon */}
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
-          </svg>
-          SUBSCRIBE ON YOUTUBE
-        </a>
-      </div>
+        <div style={{ width: 36, height: 1, background: "rgba(245,158,11,0.2)", marginBottom: 14 }} />
 
-      {/* ── Right text ── */}
-      <div className="absolute right-20 top-1/2 -translate-y-1/2 text-right z-10">
         <div
-          className="mb-2"
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: 15,
-            fontWeight: 300,
+            fontSize: 12,
             color: "rgba(254,243,199,0.3)",
+            marginBottom: 2,
           }}
         >
           An
@@ -785,8 +1034,8 @@ function Hero() {
         <div
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(1.4rem, 3vw, 2.8rem)",
-            color: "rgba(245,158,11,0.2)",
+            fontSize: "clamp(1.1rem, 4.5vw, 1.8rem)",
+            color: "rgba(245,158,11,0.25)",
             lineHeight: 1.1,
           }}
         >
@@ -795,10 +1044,11 @@ function Hero() {
         <div
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(1.6rem, 3.5vw, 3.2rem)",
+            fontSize: "clamp(1.3rem, 5.5vw, 2.2rem)",
             color: "#fef3c7",
-            lineHeight: 1.1,
-            minHeight: 44,
+            lineHeight: 1.15,
+            minHeight: 38,
+            marginBottom: 8,
           }}
         >
           <TypedText
@@ -811,52 +1061,47 @@ function Hero() {
           />
         </div>
 
-        {/* ZeroOrigins + Music sub-line — faint, right-aligned */}
-        <div
-          className="mt-5"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            gap: 6,
-          }}
-        >
-          {/* Thin rule */}
-          <div style={{ width: 40, height: 1, background: "rgba(139,92,246,0.25)" }} />
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <a
-              href="https://www.zeroorigins.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 9,
-                letterSpacing: "0.18em",
-                color: "rgba(139,92,246,0.5)",
-                textDecoration: "none",
-                transition: "color 0.3s",
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8b5cf6"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "rgba(139,92,246,0.5)"; }}
-            >
-              ↗ ZEROORIGINS.IN
-            </a>
-            <span style={{ color: "rgba(254,243,199,0.1)", fontSize: 8 }}>·</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.15em", color: "rgba(239,68,68,0.35)" }}>
-              AI MUSIC
-            </span>
-          </div>
-          <div
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 22 }}>
+          <a
+            href="https://www.zeroorigins.in"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: 8,
-              letterSpacing: "0.14em",
-              color: "rgba(254,243,199,0.12)",
+              fontSize: 9,
+              letterSpacing: "0.13em",
+              color: "rgba(139,92,246,0.5)",
+              textDecoration: "none",
             }}
           >
-            LEARN · BUILD · CREATE
-          </div>
+            ↗ ZEROORIGINS.IN
+          </a>
+          <span style={{ color: "rgba(254,243,199,0.1)", fontSize: 8 }}>·</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.1em", color: "rgba(239,68,68,0.35)" }}>
+            AI MUSIC
+          </span>
         </div>
+
+        <a
+          href="https://www.youtube.com/@AIwithnobrain?sub_confirmation=1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full"
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            letterSpacing: "0.14em",
+            border: "1px solid rgba(255,0,0,0.3)",
+            color: "rgba(255,100,100,0.8)",
+            textDecoration: "none",
+            background: "rgba(255,0,0,0.06)",
+          }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/>
+          </svg>
+          SUBSCRIBE ON YOUTUBE
+        </a>
       </div>
 
       {/* ── Background watermark ── */}
@@ -883,7 +1128,7 @@ function Story() {
   return (
     <section
       id="story"
-      className="py-32 px-10 md:px-20 relative overflow-hidden"
+      className="py-16 md:py-32 px-5 md:px-20 relative overflow-hidden"
       style={{ background: "#080505" }}
     >
       {/* Subtle color accent */}
@@ -928,7 +1173,7 @@ function Story() {
           </span>
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-16">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-16">
           <div>
             <p
               style={{
@@ -1047,7 +1292,7 @@ function Projects() {
   return (
     <section
       id="projects"
-      className="py-32 px-10 md:px-20 relative"
+      className="py-16 md:py-32 px-5 md:px-20 relative"
       style={{ background: "#0a0606" }}
     >
       <div className="max-w-6xl mx-auto">
@@ -1162,7 +1407,7 @@ function Connect() {
   return (
     <section
       id="connect"
-      className="py-32 px-10 md:px-20 relative"
+      className="py-16 md:py-32 px-5 md:px-20 relative"
       style={{
         background: "#0a0606",
         borderTop: "1px solid rgba(245,158,11,0.05)",
@@ -1272,7 +1517,7 @@ function Connect() {
 
         {/* Footer */}
         <div
-          className="mt-32 pt-8 flex justify-between items-center"
+          className="mt-16 md:mt-32 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
           style={{ borderTop: "1px solid rgba(245,158,11,0.05)" }}
         >
           <span
@@ -1284,6 +1529,8 @@ function Connect() {
               display: "flex",
               gap: 6,
               alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "center",
             }}
           >
             <span>© 2025 NAVEEN</span>
