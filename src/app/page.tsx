@@ -3,51 +3,49 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
 
-// ── Magnetic scattered letters ──────────────────────────────
+// ── 3D Floating Name ────────────────────────────────────────
 const LETTERS = ["N", "A", "V", "E", "E", "N"];
 
-// Each letter gets a random launch position outside its resting spot
 function randomScatter() {
   const angle = Math.random() * Math.PI * 2;
-  const dist = 200 + Math.random() * 300;
+  const dist = 300 + Math.random() * 400;
   return {
     x: Math.cos(angle) * dist,
     y: Math.sin(angle) * dist,
-    rotate: (Math.random() - 0.5) * 360,
-    scale: 0.2 + Math.random() * 0.5,
+    rz: (Math.random() - 0.5) * 540,
+    ry: (Math.random() - 0.5) * 180,
+    scale: 0.1 + Math.random() * 0.4,
   };
 }
 
-function MagneticName({
+function FloatingName({
   tilt,
   faded,
 }: {
   tilt: { x: number; y: number };
   faded: boolean;
 }) {
-  // settled: are letters in their resting position
   const [settled, setSettled] = useState(false);
-  // per-letter scatter offsets (only used before settling)
   const [scatters] = useState(() => LETTERS.map(() => randomScatter()));
-  // idle drift — small sinusoidal breath after settle
-  const [drift, setDrift] = useState({ x: 0, y: 0 });
+  const [drift, setDrift] = useState({ x: 0, y: 0, z: 0 });
   const rafRef = useRef<number>(0);
-  const t0 = useRef(performance.now());
+  const t0 = useRef(0);
 
-  // Fire settle after a staggered delay
   useEffect(() => {
-    const timer = setTimeout(() => setSettled(true), 80);
+    t0.current = performance.now();
+    const timer = setTimeout(() => setSettled(true), 60);
     return () => clearTimeout(timer);
   }, []);
 
-  // Continuous idle breath after settling
+  // Sinusoidal idle float after settle
   useEffect(() => {
     if (!settled) return;
     const tick = (now: number) => {
-      const elapsed = (now - t0.current) / 1000;
+      const t = (now - t0.current) / 1000;
       setDrift({
-        x: Math.sin(elapsed * 0.4) * 4,
-        y: Math.cos(elapsed * 0.55) * 3,
+        x: Math.sin(t * 0.35) * 5,
+        y: Math.sin(t * 0.28) * 4 + Math.cos(t * 0.5) * 2,
+        z: Math.sin(t * 0.22) * 8, // subtle z-bob adds depth feel
       });
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -55,52 +53,108 @@ function MagneticName({
     return () => cancelAnimationFrame(rafRef.current);
   }, [settled]);
 
+  // 3D rotation driven by tilt — clamp to ±20°
+  const rotX = Math.max(-20, Math.min(20, -tilt.y * 0.55));
+  const rotY = Math.max(-20, Math.min(20, tilt.x * 0.55));
+
   return (
+    // Perspective container — this is what creates the 3D depth
     <div
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "0.02em",
-        fontFamily: "var(--font-display)",
-        fontSize: "clamp(4rem, 8vw, 8rem)",
-        lineHeight: 0.9,
-        letterSpacing: "0.04em",
-        // Group-level tilt from mouse/gyro — applied after settle
-        transform: settled
-          ? `translate(${tilt.x * 0.55 + drift.x}px, ${tilt.y * 0.55 + drift.y}px)`
-          : "none",
-        transition: settled
-          ? "transform 0.18s cubic-bezier(0.23,1,0.32,1)"
-          : "none",
-        opacity: faded ? 0.12 : 1,
+        perspective: "800px",
+        perspectiveOrigin: "50% 50%",
+        transformStyle: "preserve-3d",
       }}
     >
-      {LETTERS.map((letter, i) => {
-        const s = scatters[i];
-        const delay = i * 55; // stagger ms
-        return (
-          <span
-            key={i}
-            style={{
-              display: "inline-block",
-              color: "#fff",
-              // Before settle: scatter position + random rotation; after: home
-              transform: settled
-                ? `translate(0,0) rotate(0deg) scale(1)`
-                : `translate(${s.x}px, ${s.y}px) rotate(${s.rotate}deg) scale(${s.scale})`,
-              opacity: settled ? 1 : 0,
-              transition: settled
-                ? `transform ${420 + delay}ms cubic-bezier(0.175,0.885,0.32,1.275) ${delay}ms,
-                   opacity ${200}ms ease ${delay}ms`
-                : "none",
-              // Per-letter micro-parallax based on index offset
-              filter: settled ? "none" : "blur(4px)",
-            }}
-          >
-            {letter}
-          </span>
-        );
-      })}
+      {/* The name group — rotates in 3D + idle drift */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.01em",
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(5rem, 10vw, 10rem)",
+          lineHeight: 0.9,
+          letterSpacing: "0.06em",
+          transformStyle: "preserve-3d",
+          transform: settled
+            ? `translate(${drift.x}px, ${drift.y}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`
+            : "rotateX(0deg) rotateY(0deg)",
+          transition: settled
+            ? "transform 0.12s cubic-bezier(0.23,1,0.32,1), opacity 0.5s ease"
+            : "none",
+          opacity: faded ? 0 : 1,
+          willChange: "transform",
+        }}
+      >
+        {LETTERS.map((letter, i) => {
+          const s = scatters[i];
+          const delay = i * 60;
+          // Each letter at a slightly different Z depth — creates parallax within the word
+          const letterZ = (i - 2.5) * 6;
+
+          return (
+            <span
+              key={i}
+              style={{
+                display: "inline-block",
+                position: "relative",
+                // Settled: rest at depth + tilt-driven 3D; unsettled: scattered
+                transform: settled
+                  ? `translateZ(${letterZ + drift.z}px)`
+                  : `translate(${s.x}px, ${s.y}px) rotateZ(${s.rz}deg) rotateY(${s.ry}deg) scale(${s.scale})`,
+                opacity: settled ? 1 : 0,
+                transition: settled
+                  ? `transform ${500 + delay}ms cubic-bezier(0.175,0.885,0.32,1.275) ${delay}ms,
+                     opacity 250ms ease ${delay}ms`
+                  : "none",
+                // 3D text — foreground fill + layered text-shadow for depth extrusion
+                color: "transparent",
+                backgroundImage:
+                  "linear-gradient(170deg, #ffffff 0%, #d4d4d4 40%, #a8a8a8 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                // Multi-layer text-shadow = 3D extrusion effect
+                textShadow: `
+                  1px 1px 0px rgba(255,255,255,0.15),
+                  2px 2px 0px rgba(200,200,200,0.12),
+                  3px 3px 0px rgba(150,150,150,0.10),
+                  4px 4px 0px rgba(100,100,100,0.08),
+                  5px 5px 0px rgba(80,80,80,0.06),
+                  6px 6px 0px rgba(60,60,60,0.05),
+                  8px 8px 20px rgba(0,0,0,0.6),
+                  0px 20px 60px rgba(0,0,0,0.4)
+                `,
+                filter: settled ? "none" : "blur(8px)",
+              }}
+            >
+              {letter}
+            </span>
+          );
+        })}
+      </div>
+
+      {/* Ground shadow — moves opposite to tilt for realism */}
+      {settled && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-18px",
+            left: "50%",
+            width: "90%",
+            height: "20px",
+            background:
+              "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 70%)",
+            transform: `translateX(-50%) translateX(${-rotY * 1.5}px) scaleX(${
+              1 - Math.abs(rotY) * 0.01
+            })`,
+            transition: "transform 0.12s ease",
+            filter: "blur(6px)",
+            borderRadius: "50%",
+            pointerEvents: "none",
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -114,27 +168,24 @@ export default function Home() {
 
   const handleLoad = useCallback(() => {
     setLoaded(true);
-    setTimeout(() => setEntered(true), 100);
+    setTimeout(() => setEntered(true), 80);
   }, []);
 
-  // Unified tilt from mouse (desktop) or gyroscope (mobile)
+  // Unified tilt — mouse on desktop, gyroscope on mobile
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Desktop: mouse
     const onMouse = (e: MouseEvent) => {
       setTilt({
-        x: (e.clientX / window.innerWidth - 0.5) * 30,
-        y: (e.clientY / window.innerHeight - 0.5) * 30,
+        x: (e.clientX / window.innerWidth - 0.5) * 40,
+        y: (e.clientY / window.innerHeight - 0.5) * 40,
       });
     };
     window.addEventListener("mousemove", onMouse);
 
-    // Mobile: device orientation (gyroscope)
     const onOrientation = (e: DeviceOrientationEvent) => {
-      // gamma = left/right tilt (-90..90), beta = front/back tilt (-180..180)
-      const x = Math.max(-20, Math.min(20, (e.gamma ?? 0) * 0.6));
-      const y = Math.max(-20, Math.min(20, ((e.beta ?? 0) - 20) * 0.5));
+      const x = Math.max(-25, Math.min(25, (e.gamma ?? 0) * 0.7));
+      const y = Math.max(-25, Math.min(25, ((e.beta ?? 0) - 20) * 0.55));
       setTilt({ x, y });
     };
     window.addEventListener("deviceorientation", onOrientation);
@@ -145,7 +196,6 @@ export default function Home() {
     };
   }, []);
 
-  // Keep mouse parallax for background blobs
   const mouse = { x: tilt.x * 0.67, y: tilt.y * 0.67 };
 
   return (
@@ -154,37 +204,46 @@ export default function Home() {
 
       {loaded && (
         <div className="h-screen w-screen flex relative overflow-hidden bg-black">
-          {/* Center divider line */}
+          {/* Center divider */}
           <div
             className="absolute top-0 left-1/2 w-[1px] h-full z-30 pointer-events-none"
             style={{
               background:
-                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent)",
+                "linear-gradient(to bottom, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent)",
               transition: "opacity 0.5s ease",
-              opacity: hoveredTrack === "none" ? 1 : 0.3,
+              opacity: hoveredTrack === "none" ? 1 : 0.2,
             }}
           />
 
-          {/* Center name — magnetic scatter + tilt */}
+          {/* ── 3D Name — always on top, never fades to invisible ── */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none text-center select-none"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] pointer-events-none text-center select-none"
+            style={{
+              // Lift above the track cards entirely
+              isolation: "isolate",
+            }}
           >
             {entered && (
               <>
-                <MagneticName
+                <FloatingName
                   tilt={tilt}
-                  faded={hoveredTrack !== "none"}
+                  faded={false} // never fully hide — always shows
                 />
+
+                {/* Subtitle — slides under the name, fades when hovering */}
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontSize: 11,
-                    letterSpacing: "0.3em",
-                    color: "rgba(255,255,255,0.3)",
-                    marginTop: 18,
-                    opacity: hoveredTrack === "none" ? 1 : 0,
-                    transition: "opacity 0.4s ease",
-                    transform: `translate(${tilt.x * 0.25}px, ${tilt.y * 0.25}px)`,
+                    letterSpacing: "0.32em",
+                    color:
+                      hoveredTrack === "none"
+                        ? "rgba(255,255,255,0.35)"
+                        : "rgba(255,255,255,0.08)",
+                    marginTop: 22,
+                    transition: "color 0.4s ease, transform 0.12s ease",
+                    transform: `translate(${tilt.x * 0.18}px, ${tilt.y * 0.18}px)`,
+                    textShadow: "0 2px 12px rgba(0,0,0,0.8)",
                   }}
                 >
                   CHOOSE YOUR PATH
@@ -205,7 +264,7 @@ export default function Home() {
             onMouseEnter={() => setHoveredTrack("pro")}
             onMouseLeave={() => setHoveredTrack("none")}
           >
-            {/* Background grid pattern */}
+            {/* Background grid */}
             <div
               className="absolute inset-0 opacity-[0.03]"
               style={{
@@ -230,7 +289,6 @@ export default function Home() {
             />
 
             <div className="relative z-10 text-center px-8">
-              {/* Icon */}
               <div
                 className="mx-auto mb-8 w-16 h-16 rounded-2xl flex items-center justify-center"
                 style={{
@@ -303,7 +361,6 @@ export default function Home() {
                 application design.
               </p>
 
-              {/* Enter arrow */}
               <div
                 className="mt-10 flex items-center gap-3 mx-auto w-fit"
                 style={{
@@ -341,7 +398,6 @@ export default function Home() {
             onMouseEnter={() => setHoveredTrack("creator")}
             onMouseLeave={() => setHoveredTrack("none")}
           >
-            {/* Background noise texture */}
             <div
               className="absolute inset-0 opacity-[0.015]"
               style={{
@@ -366,7 +422,6 @@ export default function Home() {
             />
 
             <div className="relative z-10 text-center px-8">
-              {/* Icon */}
               <div
                 className="mx-auto mb-8 w-16 h-16 rounded-2xl flex items-center justify-center"
                 style={{
@@ -441,7 +496,6 @@ export default function Home() {
                 content creation.
               </p>
 
-              {/* Enter arrow */}
               <div
                 className="mt-10 flex items-center gap-3 mx-auto w-fit"
                 style={{
