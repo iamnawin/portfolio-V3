@@ -1,7 +1,158 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
+
+// ── Shimmer keyframe injected once ──────────────────────────
+const SHIMMER_CSS = `
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 300% center; }
+}
+@keyframes colour-flood-blue {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes colour-flood-amber {
+  from { opacity: 0; } to { opacity: 1; }
+}
+`;
+
+// ── The name component ───────────────────────────────────────
+function SplitShimmerName({
+  hoveredTrack,
+  entered,
+  mouseX, // 0-1 normalised, shifts shimmer speed
+}: {
+  hoveredTrack: "none" | "pro" | "creator";
+  entered: boolean;
+  mouseX: number;
+}) {
+  // shimmer duration: slower when mouse is centre, faster toward edges
+  const shimmerDuration = 2.8 - Math.abs(mouseX - 0.5) * 1.6; // 2.0s–2.8s
+
+  // Colour state driven by hover
+  // none  → split: left=blue, right=amber (clip-path trick via two overlapping spans)
+  // pro   → full blue flood
+  // creator → full amber flood
+
+  const baseStyle: React.CSSProperties = {
+    fontFamily: "var(--font-display)",
+    fontSize: "clamp(4rem, 8vw, 8rem)",
+    lineHeight: 0.9,
+    letterSpacing: "0.04em",
+    userSelect: "none",
+    display: "block",
+    whiteSpace: "nowrap",
+  };
+
+  return (
+    <div
+      className={entered ? "animate-fade-up" : "opacity-0"}
+      style={{ position: "relative", display: "inline-block" }}
+    >
+      {/* ── Layer 1: Base white (always underneath) ── */}
+      <span style={{ ...baseStyle, color: "rgba(255,255,255,0.15)" }}>
+        NAVEEN
+      </span>
+
+      {/* ── Layer 2: Blue — left half always, full on pro hover ── */}
+      <span
+        style={{
+          ...baseStyle,
+          position: "absolute",
+          inset: 0,
+          color: "#60a5fa",
+          // clip to left half when neutral, full width on pro hover
+          clipPath:
+            hoveredTrack === "creator"
+              ? "inset(0 100% 0 0)"          // hidden
+              : hoveredTrack === "pro"
+              ? "inset(0 0% 0 0)"            // full
+              : "inset(0 50% 0 0)",          // left half
+          transition: "clip-path 0.55s cubic-bezier(0.76,0,0.24,1), opacity 0.55s ease",
+          opacity: hoveredTrack === "creator" ? 0 : 1,
+        }}
+      >
+        NAVEEN
+      </span>
+
+      {/* ── Layer 3: Amber — right half always, full on creator hover ── */}
+      <span
+        style={{
+          ...baseStyle,
+          position: "absolute",
+          inset: 0,
+          color: "#f59e0b",
+          clipPath:
+            hoveredTrack === "pro"
+              ? "inset(0 0 0 100%)"          // hidden
+              : hoveredTrack === "creator"
+              ? "inset(0 0 0 0%)"            // full
+              : "inset(0 0 0 50%)",          // right half
+          transition: "clip-path 0.55s cubic-bezier(0.76,0,0.24,1), opacity 0.55s ease",
+          opacity: hoveredTrack === "pro" ? 0 : 1,
+        }}
+      >
+        NAVEEN
+      </span>
+
+      {/* ── Layer 4: Shimmer sweep — always running ── */}
+      <span
+        aria-hidden
+        style={{
+          ...baseStyle,
+          position: "absolute",
+          inset: 0,
+          // Moving gradient: wide transparent band with a bright white spike
+          background: `linear-gradient(
+            105deg,
+            transparent 20%,
+            rgba(255,255,255,0.0) 35%,
+            rgba(255,255,255,0.55) 48%,
+            rgba(255,255,255,0.85) 50%,
+            rgba(255,255,255,0.55) 52%,
+            rgba(255,255,255,0.0) 65%,
+            transparent 80%
+          )`,
+          backgroundSize: "200% 100%",
+          animation: `shimmer-sweep ${shimmerDuration}s linear infinite`,
+          // Clip to letter shapes via mix-blend-mode
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+          mixBlendMode: "overlay",
+          pointerEvents: "none",
+          transition: "animation-duration 0.4s ease",
+        }}
+      >
+        NAVEEN
+      </span>
+
+      {/* ── Layer 5: Glow halo behind letters — pulses on hover ── */}
+      <span
+        aria-hidden
+        style={{
+          ...baseStyle,
+          position: "absolute",
+          inset: 0,
+          color: "transparent",
+          textShadow:
+            hoveredTrack === "pro"
+              ? "0 0 60px rgba(96,165,250,0.6), 0 0 120px rgba(59,130,246,0.3)"
+              : hoveredTrack === "creator"
+              ? "0 0 60px rgba(245,158,11,0.6), 0 0 120px rgba(245,158,11,0.3)"
+              : "0 0 40px rgba(255,255,255,0.08)",
+          transition: "text-shadow 0.6s ease",
+          pointerEvents: "none",
+          // WebkitTextStroke to make the transparent text shape carry the shadow
+          WebkitTextStroke: "1px transparent",
+        }}
+      >
+        NAVEEN
+      </span>
+    </div>
+  );
+}
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
@@ -15,17 +166,28 @@ export default function Home() {
     setTimeout(() => setEntered(true), 100);
   }, []);
 
-  // Mouse parallax
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  // Mouse — for parallax blobs + shimmer speed
+  const [mouse, setMouse] = useState({ x: 0, y: 0, xNorm: 0.5 });
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       setMouse({
         x: (e.clientX / window.innerWidth - 0.5) * 20,
         y: (e.clientY / window.innerHeight - 0.5) * 20,
+        xNorm: e.clientX / window.innerWidth,
       });
     };
     window.addEventListener("mousemove", handler);
     return () => window.removeEventListener("mousemove", handler);
+  }, []);
+
+  // Inject shimmer keyframe CSS once
+  const styleInjected = useRef(false);
+  useEffect(() => {
+    if (styleInjected.current) return;
+    styleInjected.current = true;
+    const el = document.createElement("style");
+    el.textContent = SHIMMER_CSS;
+    document.head.appendChild(el);
   }, []);
 
   return (
@@ -45,26 +207,19 @@ export default function Home() {
             }}
           />
 
-          {/* Center name - always visible */}
+          {/* ── Center name: split colour + shimmer ── */}
           <div
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none text-center"
             style={{
               transition: "opacity 0.5s ease",
-              opacity: hoveredTrack === "none" ? 1 : 0.15,
+              opacity: hoveredTrack === "none" ? 1 : 0.22,
             }}
           >
-            <div
-              className={entered ? "animate-fade-up" : "opacity-0"}
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(4rem, 8vw, 8rem)",
-                color: "#fff",
-                lineHeight: 0.9,
-                letterSpacing: "0.04em",
-              }}
-            >
-              NAVEEN
-            </div>
+            <SplitShimmerName
+              hoveredTrack={hoveredTrack}
+              entered={entered}
+              mouseX={mouse.xNorm}
+            />
             <div
               className={entered ? "animate-fade-up" : "opacity-0"}
               style={{
