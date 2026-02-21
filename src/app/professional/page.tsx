@@ -132,7 +132,7 @@ const QUICK_RESPONSES: Record<string, { label: string; icon: string; answer: str
     label: "Contact",
     icon: "◇",
     href: "#contact",
-    answer: "Best reached at hello@aiwithnobrain.com — or connect on LinkedIn. Open to senior roles, consulting, and interesting AI architecture problems.",
+    answer: "Best reached at t_naveen@outlook.in — or connect on LinkedIn. Open to senior roles, consulting, and interesting AI architecture problems.",
   },
 };
 
