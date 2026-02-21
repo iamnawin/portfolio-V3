@@ -1,7 +1,109 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
+
+// ── Magnetic scattered letters ──────────────────────────────
+const LETTERS = ["N", "A", "V", "E", "E", "N"];
+
+// Each letter gets a random launch position outside its resting spot
+function randomScatter() {
+  const angle = Math.random() * Math.PI * 2;
+  const dist = 200 + Math.random() * 300;
+  return {
+    x: Math.cos(angle) * dist,
+    y: Math.sin(angle) * dist,
+    rotate: (Math.random() - 0.5) * 360,
+    scale: 0.2 + Math.random() * 0.5,
+  };
+}
+
+function MagneticName({
+  tilt,
+  faded,
+}: {
+  tilt: { x: number; y: number };
+  faded: boolean;
+}) {
+  // settled: are letters in their resting position
+  const [settled, setSettled] = useState(false);
+  // per-letter scatter offsets (only used before settling)
+  const [scatters] = useState(() => LETTERS.map(() => randomScatter()));
+  // idle drift — small sinusoidal breath after settle
+  const [drift, setDrift] = useState({ x: 0, y: 0 });
+  const rafRef = useRef<number>(0);
+  const t0 = useRef(performance.now());
+
+  // Fire settle after a staggered delay
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(true), 80);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Continuous idle breath after settling
+  useEffect(() => {
+    if (!settled) return;
+    const tick = (now: number) => {
+      const elapsed = (now - t0.current) / 1000;
+      setDrift({
+        x: Math.sin(elapsed * 0.4) * 4,
+        y: Math.cos(elapsed * 0.55) * 3,
+      });
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [settled]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.02em",
+        fontFamily: "var(--font-display)",
+        fontSize: "clamp(4rem, 8vw, 8rem)",
+        lineHeight: 0.9,
+        letterSpacing: "0.04em",
+        // Group-level tilt from mouse/gyro — applied after settle
+        transform: settled
+          ? `translate(${tilt.x * 0.55 + drift.x}px, ${tilt.y * 0.55 + drift.y}px)`
+          : "none",
+        transition: settled
+          ? "transform 0.18s cubic-bezier(0.23,1,0.32,1)"
+          : "none",
+        opacity: faded ? 0.12 : 1,
+      }}
+    >
+      {LETTERS.map((letter, i) => {
+        const s = scatters[i];
+        const delay = i * 55; // stagger ms
+        return (
+          <span
+            key={i}
+            style={{
+              display: "inline-block",
+              color: "#fff",
+              // Before settle: scatter position + random rotation; after: home
+              transform: settled
+                ? `translate(0,0) rotate(0deg) scale(1)`
+                : `translate(${s.x}px, ${s.y}px) rotate(${s.rotate}deg) scale(${s.scale})`,
+              opacity: settled ? 1 : 0,
+              transition: settled
+                ? `transform ${420 + delay}ms cubic-bezier(0.175,0.885,0.32,1.275) ${delay}ms,
+                   opacity ${200}ms ease ${delay}ms`
+                : "none",
+              // Per-letter micro-parallax based on index offset
+              filter: settled ? "none" : "blur(4px)",
+            }}
+          >
+            {letter}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
@@ -15,18 +117,36 @@ export default function Home() {
     setTimeout(() => setEntered(true), 100);
   }, []);
 
-  // Mouse parallax
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  // Unified tilt from mouse (desktop) or gyroscope (mobile)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      setMouse({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
+    // Desktop: mouse
+    const onMouse = (e: MouseEvent) => {
+      setTilt({
+        x: (e.clientX / window.innerWidth - 0.5) * 30,
+        y: (e.clientY / window.innerHeight - 0.5) * 30,
       });
     };
-    window.addEventListener("mousemove", handler);
-    return () => window.removeEventListener("mousemove", handler);
+    window.addEventListener("mousemove", onMouse);
+
+    // Mobile: device orientation (gyroscope)
+    const onOrientation = (e: DeviceOrientationEvent) => {
+      // gamma = left/right tilt (-90..90), beta = front/back tilt (-180..180)
+      const x = Math.max(-20, Math.min(20, (e.gamma ?? 0) * 0.6));
+      const y = Math.max(-20, Math.min(20, ((e.beta ?? 0) - 20) * 0.5));
+      setTilt({ x, y });
+    };
+    window.addEventListener("deviceorientation", onOrientation);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouse);
+      window.removeEventListener("deviceorientation", onOrientation);
+    };
   }, []);
+
+  // Keep mouse parallax for background blobs
+  const mouse = { x: tilt.x * 0.67, y: tilt.y * 0.67 };
 
   return (
     <>
@@ -45,39 +165,32 @@ export default function Home() {
             }}
           />
 
-          {/* Center name - always visible */}
+          {/* Center name — magnetic scatter + tilt */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none text-center"
-            style={{
-              transition: "opacity 0.5s ease",
-              opacity: hoveredTrack === "none" ? 1 : 0.15,
-            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none text-center select-none"
           >
-            <div
-              className={entered ? "animate-fade-up" : "opacity-0"}
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "clamp(4rem, 8vw, 8rem)",
-                color: "#fff",
-                lineHeight: 0.9,
-                letterSpacing: "0.04em",
-              }}
-            >
-              NAVEEN
-            </div>
-            <div
-              className={entered ? "animate-fade-up" : "opacity-0"}
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
-                letterSpacing: "0.3em",
-                color: "rgba(255,255,255,0.3)",
-                marginTop: 16,
-                animationDelay: "0.3s",
-              }}
-            >
-              CHOOSE YOUR PATH
-            </div>
+            {entered && (
+              <>
+                <MagneticName
+                  tilt={tilt}
+                  faded={hoveredTrack !== "none"}
+                />
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.3em",
+                    color: "rgba(255,255,255,0.3)",
+                    marginTop: 18,
+                    opacity: hoveredTrack === "none" ? 1 : 0,
+                    transition: "opacity 0.4s ease",
+                    transform: `translate(${tilt.x * 0.25}px, ${tilt.y * 0.25}px)`,
+                  }}
+                >
+                  CHOOSE YOUR PATH
+                </div>
+              </>
+            )}
           </div>
 
           {/* ── LEFT: PROFESSIONAL TRACK ── */}
