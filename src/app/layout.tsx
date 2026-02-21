@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "Naveen | AI-Driven Application Designer & Cinematic Creator",
@@ -30,6 +31,7 @@ export default function RootLayout({
 
       <body className="bg-black text-white overflow-x-hidden">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
