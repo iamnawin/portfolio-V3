@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import CursorThemeSetter from "@/components/CursorThemeSetter";
 
@@ -102,11 +102,72 @@ function Navbar() {
   );
 }
 
-// ── Hero ───────────────────────────────────────────────────
+// ── Chat-style Hero ────────────────────────────────────────
+const QUICK_RESPONSES: Record<string, { label: string; icon: string; answer: string; href: string }> = {
+  about: {
+    label: "About",
+    icon: "◎",
+    href: "#about",
+    answer: "6+ years designing enterprise systems — started deep in Salesforce CRM, then expanded into AI-driven automation and intelligent application architecture. I don't just ship features, I design the whole system around them.",
+  },
+  experience: {
+    label: "Experience",
+    icon: "◈",
+    href: "#experience",
+    answer: "Worked across fintech, logistics, and SaaS companies as an Application Designer & Salesforce Architect. Led teams building automation pipelines, custom CRM platforms, and AI-augmented workflows at scale.",
+  },
+  skills: {
+    label: "Skills",
+    icon: "◆",
+    href: "#skills",
+    answer: "Salesforce (8 certs) · n8n & Zapier automation · AI/LLM integration · React & Next.js · System architecture · API design · Enterprise application design.",
+  },
+  projects: {
+    label: "Projects",
+    icon: "◉",
+    href: "#projects",
+    answer: "13+ enterprise projects delivered — from custom Salesforce orgs to full AI automation stacks. Currently building AI-first tools that replace manual ops workflows with intelligent pipelines.",
+  },
+  contact: {
+    label: "Contact",
+    icon: "◇",
+    href: "#contact",
+    answer: "Best reached at t_naveen@outlook.in — or connect on LinkedIn. Open to senior roles, consulting, and interesting AI architecture problems.",
+  },
+};
+
 function Hero() {
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [displayed, setDisplayed] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const typingRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handlePill = useCallback((key: string) => {
+    // Clear any running typer
+    if (typingRef.current) clearTimeout(typingRef.current);
+    setActiveKey(key);
+    setDisplayed("");
+    setIsTyping(true);
+
+    const full = QUICK_RESPONSES[key].answer;
+    let i = 0;
+    const type = () => {
+      i++;
+      setDisplayed(full.slice(0, i));
+      if (i < full.length) {
+        typingRef.current = setTimeout(type, 14);
+      } else {
+        setIsTyping(false);
+      }
+    };
+    typingRef.current = setTimeout(type, 120); // small initial delay
+  }, []);
+
+  useEffect(() => () => { if (typingRef.current) clearTimeout(typingRef.current); }, []);
+
   return (
     <section
-      className="min-h-screen flex items-center relative overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-5 md:px-10"
       style={{ background: "#0b1120" }}
     >
       {/* Grid bg */}
@@ -118,117 +179,126 @@ function Hero() {
           backgroundSize: "80px 80px",
         }}
       />
+      {/* Ambient glow */}
+      <div className="absolute w-[700px] h-[700px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 65%)", top: "10%", right: "-15%" }} />
+      <div className="absolute w-[500px] h-[500px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 65%)", bottom: "5%", left: "-5%" }} />
 
-      {/* Ambient circles */}
-      <div
-        className="absolute w-[600px] h-[600px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)",
-          top: "20%",
-          right: "-10%",
-        }}
-      />
-      <div
-        className="absolute w-[400px] h-[400px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%)",
-          bottom: "10%",
-          left: "5%",
-        }}
-      />
-
-      <div className="relative z-10 px-10 md:px-20 max-w-5xl">
-        <div
-          className="mb-6"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 12,
-            letterSpacing: "0.3em",
-            color: "rgba(96,165,250,0.5)",
-          }}
-        >
-          HELLO, I&apos;M NAVEEN
+      {/* ── Top: name + title ── */}
+      <div className="relative z-10 text-center mb-10 animate-fade-up">
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "rgba(96,165,250,0.5)", marginBottom: 14 }}>
+          HELLO, I&apos;M
         </div>
-
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "clamp(3rem, 7vw, 6.5rem)",
-            lineHeight: 0.95,
+            fontSize: "clamp(3.5rem, 9vw, 8rem)",
+            lineHeight: 0.9,
             color: "#f1f5f9",
-            letterSpacing: "0.02em",
+            letterSpacing: "0.03em",
           }}
         >
-          AI-DRIVEN
-          <br />
-          <span style={{ color: "#3b82f6" }}>APPLICATION</span>
-          <br />
-          DESIGNER
+          NAVEEN
         </h1>
-
-        <div
-          className="mt-8"
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: 18,
-            color: "#60a5fa",
-            minHeight: 28,
-          }}
-        >
-          <TypedText
-            texts={[
-              "Intelligent Systems Designer",
-              "Automation & Application Architect",
-              "Enterprise Solutions Engineer",
-              "Salesforce Platform Expert",
-            ]}
-          />
-        </div>
-
-        <p
-          className="mt-8 max-w-xl"
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: 16,
-            lineHeight: 1.8,
-            color: "rgba(148,163,184,0.7)",
-          }}
-        >
-          I bring over 6 years of experience designing enterprise applications, starting with Salesforce CRM and large-scale automation projects. 
-          As AI began transforming workflows, I integrated AI-driven automation and intelligent systems into enterprise solutions, focusing on building scalable architectures that actually work in production environments
-        </p>
-
-        <div className="mt-10 flex gap-4">
-          <a
-            href="#projects"
-            className="px-8 py-3.5 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.12em",
-              background: "#3b82f6",
-              color: "#fff",
-              textDecoration: "none",
-            }}
-          >
-            VIEW WORK
-          </a>
-          <a
-            href="#contact"
-            className="px-8 py-3.5 rounded-full text-sm transition-all duration-300"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 12,
-              letterSpacing: "0.12em",
-              border: "1px solid rgba(59,130,246,0.3)",
-              color: "#60a5fa",
-              textDecoration: "none",
-            }}
-          >
-            CONTACT
-          </a>
+        <div className="mt-4" style={{ fontFamily: "var(--font-body)", fontSize: 17, color: "#60a5fa", minHeight: 26 }}>
+          <TypedText texts={["Intelligent Systems Designer", "AI Application Architect", "Enterprise Solutions Engineer", "Salesforce Platform Expert"]} />
         </div>
       </div>
+
+      {/* ── Chat card ── */}
+      <div
+        className="relative z-10 w-full max-w-2xl animate-fade-up"
+        style={{ animationDelay: "0.2s" }}
+      >
+        {/* Response bubble — appears when a pill is tapped */}
+        <div
+          style={{
+            minHeight: 90,
+            marginBottom: 16,
+            padding: "20px 24px",
+            borderRadius: 18,
+            background: "rgba(59,130,246,0.06)",
+            border: "1px solid rgba(59,130,246,0.12)",
+            transition: "all 0.3s ease",
+            opacity: activeKey ? 1 : 0.4,
+          }}
+        >
+          {/* Header row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            {/* Avatar dot */}
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#3b82f6,#6366f1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 14, color: "#fff" }}>N</span>
+            </div>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.2em", color: "rgba(96,165,250,0.6)" }}>
+              NAVEEN · AI APPLICATION DESIGNER
+            </span>
+            {isTyping && (
+              <span style={{ marginLeft: "auto", display: "flex", gap: 3 }}>
+                {[0,1,2].map(i => (
+                  <span key={i} style={{ width: 4, height: 4, borderRadius: "50%", background: "#3b82f6", display: "inline-block", animation: `bounce 1s ease ${i*0.15}s infinite` }} />
+                ))}
+              </span>
+            )}
+          </div>
+
+          {/* Answer text */}
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 15, lineHeight: 1.75, color: activeKey ? "rgba(241,245,249,0.85)" : "rgba(148,163,184,0.4)", margin: 0 }}>
+            {activeKey
+              ? displayed || <>&nbsp;</>
+              : "Click any button below to learn about me →"}
+          </p>
+
+          {/* Scroll to section link */}
+          {activeKey && !isTyping && (
+            <a
+              href={QUICK_RESPONSES[activeKey].href}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.18em", color: "#3b82f6", textDecoration: "none", opacity: 0.8 }}
+            >
+              VIEW FULL SECTION ↓
+            </a>
+          )}
+        </div>
+
+        {/* Quick-tap pills */}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+          {Object.entries(QUICK_RESPONSES).map(([key, val]) => (
+            <button
+              key={key}
+              onClick={() => handlePill(key)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                padding: "10px 20px",
+                borderRadius: 50,
+                border: activeKey === key
+                  ? "1px solid rgba(59,130,246,0.6)"
+                  : "1px solid rgba(59,130,246,0.15)",
+                background: activeKey === key
+                  ? "rgba(59,130,246,0.12)"
+                  : "rgba(59,130,246,0.04)",
+                color: activeKey === key ? "#60a5fa" : "rgba(148,163,184,0.6)",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                letterSpacing: "0.14em",
+                cursor: "pointer",
+                transition: "all 0.25s ease",
+                boxShadow: activeKey === key ? "0 0 20px rgba(59,130,246,0.15)" : "none",
+              }}
+            >
+              <span style={{ fontSize: 13, opacity: 0.7 }}>{val.icon}</span>
+              {val.label.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Bounce dots keyframe */}
+      <style>{`
+        @keyframes bounce {
+          0%,80%,100% { transform:translateY(0); opacity:0.4; }
+          40% { transform:translateY(-5px); opacity:1; }
+        }
+      `}</style>
     </section>
   );
 }
