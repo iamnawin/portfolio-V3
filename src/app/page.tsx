@@ -3,154 +3,206 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Preloader from "@/components/Preloader";
 
-// ── 3D Floating Name ────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+//  NAVEEN — Holographic 3D nameplate
+//  • Always centered, never scattered
+//  • CSS perspective tilt driven by mouse / device gyroscope
+//  • Animated gradient simulates a moving light source (specular)
+//  • Letter-level stagger on entrance (slide up from below + fade)
+//  • Idle breath keeps it alive when user isn't moving
+// ─────────────────────────────────────────────────────────────
+
 const LETTERS = ["N", "A", "V", "E", "E", "N"];
 
-function randomScatter() {
-  const angle = Math.random() * Math.PI * 2;
-  const dist = 300 + Math.random() * 400;
-  return {
-    x: Math.cos(angle) * dist,
-    y: Math.sin(angle) * dist,
-    rz: (Math.random() - 0.5) * 540,
-    ry: (Math.random() - 0.5) * 180,
-    scale: 0.1 + Math.random() * 0.4,
-  };
-}
-
-function FloatingName({
+function HolographicName({
   tilt,
-  faded,
+  hoveredTrack,
 }: {
   tilt: { x: number; y: number };
-  faded: boolean;
+  hoveredTrack: string;
 }) {
-  const [settled, setSettled] = useState(false);
-  const [scatters] = useState(() => LETTERS.map(() => randomScatter()));
-  const [drift, setDrift] = useState({ x: 0, y: 0, z: 0 });
+  const [ready, setReady] = useState(false);
+  const [breath, setBreath] = useState({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
   const t0 = useRef(0);
 
+  // Delay entrance so letters animate in after preloader
   useEffect(() => {
     t0.current = performance.now();
-    const timer = setTimeout(() => setSettled(true), 60);
+    const timer = setTimeout(() => setReady(true), 120);
     return () => clearTimeout(timer);
   }, []);
 
-  // Sinusoidal idle float after settle
+  // Subtle idle sinusoidal breath — keeps it alive when user isn't moving
   useEffect(() => {
-    if (!settled) return;
     const tick = (now: number) => {
       const t = (now - t0.current) / 1000;
-      setDrift({
-        x: Math.sin(t * 0.35) * 5,
-        y: Math.sin(t * 0.28) * 4 + Math.cos(t * 0.5) * 2,
-        z: Math.sin(t * 0.22) * 8, // subtle z-bob adds depth feel
+      setBreath({
+        x: Math.sin(t * 0.4) * 1.5,
+        y: Math.cos(t * 0.3) * 1.2,
       });
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [settled]);
+  }, []);
 
-  // 3D rotation driven by tilt — clamp to ±20°
-  const rotX = Math.max(-20, Math.min(20, -tilt.y * 0.55));
-  const rotY = Math.max(-20, Math.min(20, tilt.x * 0.55));
+  // 3D rotation angles from tilt input
+  const rotX = -tilt.y * 0.45 + breath.y;   // tilt up/down
+  const rotY =  tilt.x * 0.45 + breath.x;   // tilt left/right
+
+  // Light position for specular highlight — shifts with tilt
+  const lightX = 50 + tilt.x * 1.8;         // % across name
+  const lightY = 50 + tilt.y * 1.8;
+
+  // Opacity: dim slightly when a track is hovered so track content reads
+  const nameOpacity = hoveredTrack === "none" ? 1 : 0.18;
 
   return (
-    // Perspective container — this is what creates the 3D depth
     <div
       style={{
-        perspective: "800px",
+        perspective: "900px",
         perspectiveOrigin: "50% 50%",
-        transformStyle: "preserve-3d",
       }}
     >
-      {/* The name group — rotates in 3D + idle drift */}
+      {/* The rotating word container */}
       <div
         style={{
+          transformStyle: "preserve-3d",
+          transform: `rotateX(${rotX}deg) rotateY(${rotY}deg)`,
+          transition: "transform 0.08s cubic-bezier(0.23,1,0.32,1), opacity 0.5s ease",
+          opacity: nameOpacity,
+          willChange: "transform",
           display: "flex",
           alignItems: "center",
-          gap: "0.01em",
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(5rem, 10vw, 10rem)",
-          lineHeight: 0.9,
-          letterSpacing: "0.06em",
-          transformStyle: "preserve-3d",
-          transform: settled
-            ? `translate(${drift.x}px, ${drift.y}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`
-            : "rotateX(0deg) rotateY(0deg)",
-          transition: settled
-            ? "transform 0.12s cubic-bezier(0.23,1,0.32,1), opacity 0.5s ease"
-            : "none",
-          opacity: faded ? 0 : 1,
-          willChange: "transform",
+          gap: 0,
+          position: "relative",
         }}
       >
+        {/* ── Specular light sweep — moves with tilt ── */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: "-20px -30px",
+            borderRadius: 8,
+            background: `radial-gradient(ellipse 55% 60% at ${lightX}% ${lightY}%,
+              rgba(255,255,255,0.13) 0%,
+              rgba(255,255,255,0.04) 40%,
+              transparent 70%)`,
+            pointerEvents: "none",
+            zIndex: 2,
+            transition: "background 0.08s ease",
+          }}
+        />
+
+        {/* ── Each letter ── */}
         {LETTERS.map((letter, i) => {
-          const s = scatters[i];
-          const delay = i * 60;
-          // Each letter at a slightly different Z depth — creates parallax within the word
-          const letterZ = (i - 2.5) * 6;
+          const delay = i * 80; // entrance stagger
+          // Slight Z-depth variation per letter for parallax
+          const zDepth = Math.sin((i / (LETTERS.length - 1)) * Math.PI) * 18;
 
           return (
-            <span
+            <div
               key={i}
               style={{
-                display: "inline-block",
                 position: "relative",
-                // Settled: rest at depth + tilt-driven 3D; unsettled: scattered
-                transform: settled
-                  ? `translateZ(${letterZ + drift.z}px)`
-                  : `translate(${s.x}px, ${s.y}px) rotateZ(${s.rz}deg) rotateY(${s.ry}deg) scale(${s.scale})`,
-                opacity: settled ? 1 : 0,
-                transition: settled
-                  ? `transform ${500 + delay}ms cubic-bezier(0.175,0.885,0.32,1.275) ${delay}ms,
-                     opacity 250ms ease ${delay}ms`
+                display: "inline-block",
+                transform: ready
+                  ? `translateZ(${zDepth}px)`
+                  : `translateZ(${zDepth}px) translateY(60px)`,
+                opacity: ready ? 1 : 0,
+                transition: ready
+                  ? `transform 700ms cubic-bezier(0.16,1,0.3,1) ${delay}ms,
+                     opacity 500ms ease ${delay}ms`
                   : "none",
-                // 3D text — foreground fill + layered text-shadow for depth extrusion
-                color: "transparent",
-                backgroundImage:
-                  "linear-gradient(170deg, #ffffff 0%, #d4d4d4 40%, #a8a8a8 100%)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                // Multi-layer text-shadow = 3D extrusion effect
-                textShadow: `
-                  1px 1px 0px rgba(255,255,255,0.15),
-                  2px 2px 0px rgba(200,200,200,0.12),
-                  3px 3px 0px rgba(150,150,150,0.10),
-                  4px 4px 0px rgba(100,100,100,0.08),
-                  5px 5px 0px rgba(80,80,80,0.06),
-                  6px 6px 0px rgba(60,60,60,0.05),
-                  8px 8px 20px rgba(0,0,0,0.6),
-                  0px 20px 60px rgba(0,0,0,0.4)
-                `,
-                filter: settled ? "none" : "blur(8px)",
               }}
             >
-              {letter}
-            </span>
+              {/* Main letter — chrome gradient fill */}
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(5.5rem, 11vw, 11rem)",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                  display: "block",
+                  // Chrome / polished steel gradient
+                  background: `
+                    linear-gradient(
+                      170deg,
+                      #ffffff 0%,
+                      #e8e8e8 18%,
+                      #b0b0b0 35%,
+                      #d8d8d8 50%,
+                      #888 65%,
+                      #c0c0c0 78%,
+                      #f0f0f0 100%
+                    )`,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                  // 3D extrusion: layered drop shadows give thickness
+                  filter: `
+                    drop-shadow(0 1px 0 rgba(255,255,255,0.6))
+                    drop-shadow(0 2px 0 rgba(180,180,180,0.4))
+                    drop-shadow(0 4px 0 rgba(120,120,120,0.3))
+                    drop-shadow(0 6px 0 rgba(80,80,80,0.2))
+                    drop-shadow(0 10px 24px rgba(0,0,0,0.7))
+                    drop-shadow(0 2px 40px rgba(0,0,0,0.4))
+                  `,
+                  userSelect: "none",
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
+                {letter}
+              </span>
+
+              {/* Per-letter tilt-shifted colour bloom */}
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "block",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(5.5rem, 11vw, 11rem)",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                  // Coloured halo that shifts with tilt — half blue, half amber
+                  background: `radial-gradient(ellipse at ${lightX}% ${lightY}%,
+                    rgba(100,180,255,0.25) 0%,
+                    rgba(255,180,50,0.12) 50%,
+                    transparent 70%)`,
+                  WebkitBackgroundClip: "text",
+                  backgroundClip: "text",
+                  color: "transparent",
+                  zIndex: 3,
+                  pointerEvents: "none",
+                  transition: "background 0.08s ease",
+                }}
+              >
+                {letter}
+              </span>
+            </div>
           );
         })}
       </div>
 
-      {/* Ground shadow — moves opposite to tilt for realism */}
-      {settled && (
+      {/* ── Ground reflection / shadow ── */}
+      {ready && (
         <div
+          aria-hidden
           style={{
-            position: "absolute",
-            bottom: "-18px",
-            left: "50%",
-            width: "90%",
-            height: "20px",
-            background:
-              "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, transparent 70%)",
-            transform: `translateX(-50%) translateX(${-rotY * 1.5}px) scaleX(${
-              1 - Math.abs(rotY) * 0.01
-            })`,
-            transition: "transform 0.12s ease",
-            filter: "blur(6px)",
-            borderRadius: "50%",
+            marginTop: 6,
+            height: 28,
+            background: `radial-gradient(ellipse 70% 100% at ${50 - rotY * 1.2}% 0%,
+              rgba(255,255,255,0.06) 0%,
+              transparent 80%)`,
+            filter: "blur(4px)",
+            transform: `scaleY(-1) scaleX(${1 - Math.abs(rotY) * 0.004})`,
+            opacity: 0.5,
+            transition: "background 0.08s ease",
             pointerEvents: "none",
           }}
         />
@@ -159,44 +211,60 @@ function FloatingName({
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+//  Main page
+// ─────────────────────────────────────────────────────────────
 export default function Home() {
   const [loaded, setLoaded] = useState(false);
-  const [hoveredTrack, setHoveredTrack] = useState<"none" | "pro" | "creator">(
-    "none"
-  );
+  const [hoveredTrack, setHoveredTrack] = useState<"none" | "pro" | "creator">("none");
   const [entered, setEntered] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const handleLoad = useCallback(() => {
     setLoaded(true);
     setTimeout(() => setEntered(true), 80);
   }, []);
 
-  // Unified tilt — mouse on desktop, gyroscope on mobile
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-
   useEffect(() => {
+    // Smooth mouse → tilt (lerped in rAF)
+    let target = { x: 0, y: 0 };
+    let current = { x: 0, y: 0 };
+    let raf: number;
+
     const onMouse = (e: MouseEvent) => {
-      setTilt({
-        x: (e.clientX / window.innerWidth - 0.5) * 40,
-        y: (e.clientY / window.innerHeight - 0.5) * 40,
-      });
+      target = {
+        x: (e.clientX / window.innerWidth  - 0.5) * 28,
+        y: (e.clientY / window.innerHeight - 0.5) * 28,
+      };
     };
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const tick = () => {
+      current.x = lerp(current.x, target.x, 0.08);
+      current.y = lerp(current.y, target.y, 0.08);
+      setTilt({ x: current.x, y: current.y });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
     window.addEventListener("mousemove", onMouse);
 
+    // Gyroscope for mobile
     const onOrientation = (e: DeviceOrientationEvent) => {
-      const x = Math.max(-25, Math.min(25, (e.gamma ?? 0) * 0.7));
-      const y = Math.max(-25, Math.min(25, ((e.beta ?? 0) - 20) * 0.55));
-      setTilt({ x, y });
+      target = {
+        x: Math.max(-18, Math.min(18, (e.gamma ?? 0) * 0.55)),
+        y: Math.max(-18, Math.min(18, ((e.beta  ?? 0) - 20) * 0.45)),
+      };
     };
     window.addEventListener("deviceorientation", onOrientation);
 
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMouse);
       window.removeEventListener("deviceorientation", onOrientation);
     };
   }, []);
 
-  const mouse = { x: tilt.x * 0.67, y: tilt.y * 0.67 };
+  const mouse = tilt; // blobs use same tilt
 
   return (
     <>
@@ -204,46 +272,39 @@ export default function Home() {
 
       {loaded && (
         <div className="h-screen w-screen flex relative overflow-hidden bg-black">
-          {/* Center divider */}
+
+          {/* ── Center divider ── */}
           <div
             className="absolute top-0 left-1/2 w-[1px] h-full z-30 pointer-events-none"
             style={{
               background:
                 "linear-gradient(to bottom, transparent, rgba(255,255,255,0.06) 20%, rgba(255,255,255,0.06) 80%, transparent)",
+              opacity: hoveredTrack === "none" ? 1 : 0.15,
               transition: "opacity 0.5s ease",
-              opacity: hoveredTrack === "none" ? 1 : 0.2,
             }}
           />
 
-          {/* ── 3D Name — always on top, never fades to invisible ── */}
+          {/* ── Holographic NAVEEN — pinned centre, z above everything ── */}
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] pointer-events-none text-center select-none"
-            style={{
-              // Lift above the track cards entirely
-              isolation: "isolate",
-            }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] pointer-events-none select-none text-center"
           >
             {entered && (
               <>
-                <FloatingName
-                  tilt={tilt}
-                  faded={false} // never fully hide — always shows
-                />
+                <HolographicName tilt={tilt} hoveredTrack={hoveredTrack} />
 
-                {/* Subtitle — slides under the name, fades when hovering */}
+                {/* Subtitle */}
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: 11,
-                    letterSpacing: "0.32em",
-                    color:
-                      hoveredTrack === "none"
-                        ? "rgba(255,255,255,0.35)"
-                        : "rgba(255,255,255,0.08)",
-                    marginTop: 22,
-                    transition: "color 0.4s ease, transform 0.12s ease",
-                    transform: `translate(${tilt.x * 0.18}px, ${tilt.y * 0.18}px)`,
-                    textShadow: "0 2px 12px rgba(0,0,0,0.8)",
+                    fontSize: 10,
+                    letterSpacing: "0.35em",
+                    color: hoveredTrack === "none"
+                      ? "rgba(255,255,255,0.28)"
+                      : "rgba(255,255,255,0.06)",
+                    marginTop: 20,
+                    transition: "color 0.5s ease",
+                    transform: `translateX(${tilt.x * 0.12}px)`,
+                    textShadow: "0 2px 16px rgba(0,0,0,1)",
                   }}
                 >
                   CHOOSE YOUR PATH
@@ -252,19 +313,19 @@ export default function Home() {
             )}
           </div>
 
-          {/* ── LEFT: PROFESSIONAL TRACK ── */}
+          {/* ── LEFT: PROFESSIONAL ── */}
           <Link
             href="/professional"
-            className="relative flex-1 flex flex-col items-center justify-center cursor-pointer group no-underline"
+            className="relative flex-1 flex flex-col items-center justify-center cursor-pointer no-underline"
             style={{
               background: hoveredTrack === "pro" ? "#0b1120" : "#080c16",
-              transition: "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)",
+              transition: "all 0.6s cubic-bezier(0.25,0.1,0.25,1)",
               flex: hoveredTrack === "pro" ? 1.3 : hoveredTrack === "creator" ? 0.7 : 1,
             }}
             onMouseEnter={() => setHoveredTrack("pro")}
             onMouseLeave={() => setHoveredTrack("none")}
           >
-            {/* Background grid */}
+            {/* Grid */}
             <div
               className="absolute inset-0 opacity-[0.03]"
               style={{
@@ -273,15 +334,12 @@ export default function Home() {
                 backgroundSize: "60px 60px",
               }}
             />
-
-            {/* Blue ambient glow */}
+            {/* Blue glow */}
             <div
               className="absolute w-[400px] h-[400px] rounded-full"
               style={{
-                background:
-                  "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
-                top: "40%",
-                left: "50%",
+                background: "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
+                top: "40%", left: "50%",
                 transform: `translate(calc(-50% + ${mouse.x * 0.5}px), calc(-50% + ${mouse.y * 0.5}px))`,
                 transition: "transform 0.3s ease",
                 opacity: hoveredTrack === "pro" ? 1 : 0.3,
@@ -295,126 +353,54 @@ export default function Home() {
                   border: "1px solid rgba(59,130,246,0.2)",
                   background: "rgba(59,130,246,0.05)",
                   transition: "all 0.4s ease",
-                  boxShadow:
-                    hoveredTrack === "pro"
-                      ? "0 0 40px rgba(59,130,246,0.2)"
-                      : "none",
+                  boxShadow: hoveredTrack === "pro" ? "0 0 40px rgba(59,130,246,0.2)" : "none",
                 }}
               >
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="rgba(96,165,250,0.8)"
-                  strokeWidth="1.5"
-                >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.8)" strokeWidth="1.5">
                   <path d="M12 2L2 7l10 5 10-5-10-5z" />
                   <path d="M2 17l10 5 10-5" />
                   <path d="M2 12l10 5 10-5" />
                 </svg>
               </div>
 
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10,
-                  letterSpacing: "0.3em",
-                  color: "rgba(96,165,250,0.6)",
-                  marginBottom: 16,
-                }}
-              >
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.3em", color: "rgba(96,165,250,0.6)", marginBottom: 16 }}>
                 PROFESSIONAL
               </div>
 
-              <h2
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
-                  color: hoveredTrack === "pro" ? "#60a5fa" : "rgba(241,245,249,0.7)",
-                  lineHeight: 1.1,
-                  transition: "color 0.4s ease",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                AI-DRIVEN
-                <br />
-                APPLICATION
-                <br />
-                DESIGNER
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.5rem,3vw,2.5rem)", color: hoveredTrack === "pro" ? "#60a5fa" : "rgba(241,245,249,0.7)", lineHeight: 1.1, transition: "color 0.4s ease", letterSpacing: "0.02em" }}>
+                AI-DRIVEN<br />APPLICATION<br />DESIGNER
               </h2>
 
-              <p
-                className="mt-6 max-w-[280px] mx-auto"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  color: "rgba(148,163,184,0.6)",
-                  transition: "color 0.4s ease",
-                  ...(hoveredTrack === "pro" && {
-                    color: "rgba(148,163,184,0.9)",
-                  }),
-                }}
-              >
-                Enterprise architecture, intelligent automation, and scalable
-                application design.
+              <p className="mt-6 max-w-[280px] mx-auto" style={{ fontFamily: "var(--font-body)", fontSize: 13, lineHeight: 1.7, color: hoveredTrack === "pro" ? "rgba(148,163,184,0.9)" : "rgba(148,163,184,0.6)", transition: "color 0.4s ease" }}>
+                Enterprise architecture, intelligent automation, and scalable application design.
               </p>
 
-              <div
-                className="mt-10 flex items-center gap-3 mx-auto w-fit"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.2em",
-                  color: "rgba(96,165,250,0.4)",
-                  opacity: hoveredTrack === "pro" ? 1 : 0,
-                  transform:
-                    hoveredTrack === "pro"
-                      ? "translateY(0)"
-                      : "translateY(10px)",
-                  transition: "all 0.4s ease",
-                }}
-              >
+              <div className="mt-10 flex items-center gap-3 mx-auto w-fit" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "rgba(96,165,250,0.4)", opacity: hoveredTrack === "pro" ? 1 : 0, transform: hoveredTrack === "pro" ? "translateY(0)" : "translateY(10px)", transition: "all 0.4s ease" }}>
                 ENTER →
               </div>
             </div>
           </Link>
 
-          {/* ── RIGHT: CREATOR TRACK ── */}
+          {/* ── RIGHT: CREATOR ── */}
           <Link
             href="/creator"
-            className="relative flex-1 flex flex-col items-center justify-center cursor-pointer group no-underline"
+            className="relative flex-1 flex flex-col items-center justify-center cursor-pointer no-underline"
             style={{
               background: hoveredTrack === "creator" ? "#0a0606" : "#080606",
-              transition: "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)",
-              flex:
-                hoveredTrack === "creator"
-                  ? 1.3
-                  : hoveredTrack === "pro"
-                    ? 0.7
-                    : 1,
+              transition: "all 0.6s cubic-bezier(0.25,0.1,0.25,1)",
+              flex: hoveredTrack === "creator" ? 1.3 : hoveredTrack === "pro" ? 0.7 : 1,
             }}
             onMouseEnter={() => setHoveredTrack("creator")}
             onMouseLeave={() => setHoveredTrack("none")}
           >
-            <div
-              className="absolute inset-0 opacity-[0.015]"
-              style={{
-                backgroundImage: `radial-gradient(circle at 20% 30%, rgba(245,158,11,0.3) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 70%, rgba(239,68,68,0.2) 0%, transparent 50%),
-                  radial-gradient(circle at 50% 50%, rgba(139,92,246,0.2) 0%, transparent 50%)`,
-              }}
-            />
+            <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(245,158,11,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(239,68,68,0.2) 0%, transparent 50%)" }} />
 
-            {/* Warm ambient glow */}
+            {/* Amber glow */}
             <div
               className="absolute w-[400px] h-[400px] rounded-full"
               style={{
-                background:
-                  "radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)",
-                top: "40%",
-                left: "50%",
+                background: "radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%)",
+                top: "40%", left: "50%",
                 transform: `translate(calc(-50% + ${mouse.x * 0.5}px), calc(-50% + ${mouse.y * 0.5}px))`,
                 transition: "transform 0.3s ease",
                 opacity: hoveredTrack === "creator" ? 1 : 0.3,
@@ -428,122 +414,40 @@ export default function Home() {
                   border: "1px solid rgba(245,158,11,0.2)",
                   background: "rgba(245,158,11,0.05)",
                   transition: "all 0.4s ease",
-                  boxShadow:
-                    hoveredTrack === "creator"
-                      ? "0 0 40px rgba(245,158,11,0.2)"
-                      : "none",
+                  boxShadow: hoveredTrack === "creator" ? "0 0 40px rgba(245,158,11,0.2)" : "none",
                 }}
               >
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="rgba(245,158,11,0.8)"
-                  strokeWidth="1.5"
-                >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(245,158,11,0.8)" strokeWidth="1.5">
                   <polygon points="23 7 16 12 23 17 23 7" />
                   <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                 </svg>
               </div>
 
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10,
-                  letterSpacing: "0.3em",
-                  color: "rgba(245,158,11,0.6)",
-                  marginBottom: 16,
-                }}
-              >
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.3em", color: "rgba(245,158,11,0.6)", marginBottom: 16 }}>
                 CREATIVE
               </div>
 
-              <h2
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(1.5rem, 3vw, 2.5rem)",
-                  color:
-                    hoveredTrack === "creator"
-                      ? "#f59e0b"
-                      : "rgba(254,243,199,0.7)",
-                  lineHeight: 1.1,
-                  transition: "color 0.4s ease",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                AI CINEMATIC
-                <br />
-                CREATOR &
-                <br />
-                STORYTELLER
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.5rem,3vw,2.5rem)", color: hoveredTrack === "creator" ? "#f59e0b" : "rgba(254,243,199,0.7)", lineHeight: 1.1, transition: "color 0.4s ease", letterSpacing: "0.02em" }}>
+                AI CINEMATIC<br />CREATOR &<br />STORYTELLER
               </h2>
 
-              <p
-                className="mt-6 max-w-[280px] mx-auto"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  color: "rgba(168,137,107,0.6)",
-                  transition: "color 0.4s ease",
-                  ...(hoveredTrack === "creator" && {
-                    color: "rgba(168,137,107,0.9)",
-                  }),
-                }}
-              >
-                AI-powered cinematic storytelling, mythology, automation, and
-                content creation.
+              <p className="mt-6 max-w-[280px] mx-auto" style={{ fontFamily: "var(--font-body)", fontSize: 13, lineHeight: 1.7, color: hoveredTrack === "creator" ? "rgba(168,137,107,0.9)" : "rgba(168,137,107,0.6)", transition: "color 0.4s ease" }}>
+                AI-powered cinematic storytelling, mythology, automation, and content creation.
               </p>
 
-              <div
-                className="mt-10 flex items-center gap-3 mx-auto w-fit"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  letterSpacing: "0.2em",
-                  color: "rgba(245,158,11,0.4)",
-                  opacity: hoveredTrack === "creator" ? 1 : 0,
-                  transform:
-                    hoveredTrack === "creator"
-                      ? "translateY(0)"
-                      : "translateY(10px)",
-                  transition: "all 0.4s ease",
-                }}
-              >
+              <div className="mt-10 flex items-center gap-3 mx-auto w-fit" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "rgba(245,158,11,0.4)", opacity: hoveredTrack === "creator" ? 1 : 0, transform: hoveredTrack === "creator" ? "translateY(0)" : "translateY(10px)", transition: "all 0.4s ease" }}>
                 ENTER →
               </div>
             </div>
           </Link>
 
-          {/* Bottom bar */}
+          {/* ── Bottom bar ── */}
           <div
             className="absolute bottom-6 left-0 right-0 z-40 flex justify-between items-center px-10"
-            style={{
-              opacity: entered ? 1 : 0,
-              transition: "opacity 1s ease 0.5s",
-            }}
+            style={{ opacity: entered ? 1 : 0, transition: "opacity 1s ease 0.8s" }}
           >
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                letterSpacing: "0.2em",
-                color: "rgba(255,255,255,0.15)",
-              }}
-            >
-              © 2025
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                letterSpacing: "0.2em",
-                color: "rgba(255,255,255,0.15)",
-              }}
-            >
-              AIWITHNOBRAIN • ZEROORIGINS
-            </span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.15)" }}>© 2025</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.2em", color: "rgba(255,255,255,0.15)" }}>AIWITHNOBRAIN • ZEROORIGINS</span>
           </div>
         </div>
       )}
