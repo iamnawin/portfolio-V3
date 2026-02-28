@@ -21,7 +21,7 @@ const SIDES = {
     cardBg: "rgba(11,17,32,0.95)",
     avatarBg: "linear-gradient(135deg, #1e3a5f 0%, #0b1120 100%)",
     avatarAccent: "#3b82f6",
-    // Avatar icon: briefcase/layers shape for professional
+    photo: "/naveen-pro.jpg",
     icon: (
       <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
         <rect x="8" y="16" width="32" height="24" rx="4" stroke="#60a5fa" strokeWidth="2" fill="none"/>
@@ -48,7 +48,7 @@ const SIDES = {
     cardBg: "rgba(20,12,0,0.95)",
     avatarBg: "linear-gradient(135deg, #3d1f00 0%, #110900 100%)",
     avatarAccent: "#f59e0b",
-    // Avatar icon: camera/film shape for creative
+    photo: "/naveen-creative.jpg",
     icon: (
       <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
         <rect x="4" y="14" width="30" height="20" rx="4" stroke="#f59e0b" strokeWidth="2" fill="none"/>
@@ -76,8 +76,9 @@ function Particle({ accent }: { accent: string }) {
   return <div style={style} />;
 }
 
-// ─── Avatar placeholder (swap with <Image> when you have photos) ──
+// ─── Avatar ────────────────────────────────────────────────
 function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number }) {
+  const [imgError, setImgError] = useState(false);
   return (
     <div
       style={{
@@ -91,6 +92,7 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
         justifyContent: "center",
         position: "relative",
         flexShrink: 0,
+        overflow: "hidden",
         boxShadow: `0 0 40px ${side.accentSoft}0.15), inset 0 0 30px ${side.accentSoft}0.05)`,
       }}
     >
@@ -98,21 +100,32 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
       <div style={{
         position: "absolute", inset: -6, borderRadius: "50%",
         border: `1px solid ${side.accentSoft}0.15)`,
+        zIndex: 2, pointerEvents: "none",
       }} />
       {/* Inner ring */}
       <div style={{
         position: "absolute", inset: -12, borderRadius: "50%",
         border: `1px solid ${side.accentSoft}0.07)`,
+        zIndex: 2, pointerEvents: "none",
       }} />
-      {/* Icon */}
-      {side.icon}
-      {/*
-        TO ADD YOUR REAL PHOTO:
-        Replace the icon above with:
-        <img src="/naveen-pro.jpg" (or naveen-creative.jpg)
-          style={{ width:"100%", height:"100%", borderRadius:"50%", objectFit:"cover" }}
+      {/* Photo or icon fallback */}
+      {!imgError ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={side.photo}
+          alt={`Naveen - ${side.label}`}
+          onError={() => setImgError(true)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center top",
+            borderRadius: "50%",
+          }}
         />
-      */}
+      ) : (
+        side.icon
+      )}
     </div>
   );
 }
