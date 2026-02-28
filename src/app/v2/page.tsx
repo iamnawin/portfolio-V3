@@ -1,0 +1,440 @@
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+
+// ─── Profile data for each side ───────────────────────────
+const SIDES = {
+  pro: {
+    id: "pro",
+    label: "PROFESSIONAL",
+    name: "NAVEEN",
+    title: "AI Application Designer",
+    subtitle: "Salesforce Architect & Enterprise Systems",
+    tags: ["6+ Years", "8 Certifications", "13+ Projects"],
+    desc: "I design systems that scale — Salesforce, AI automation, and enterprise architecture.",
+    enter: "/professional",
+    enterLabel: "VIEW PROFESSIONAL PROFILE",
+    flipLabel: "SEE CREATIVE SIDE",
+    accent: "#3b82f6",
+    accentSoft: "rgba(59,130,246,",
+    bg: "#060d1a",
+    cardBg: "rgba(11,17,32,0.95)",
+    avatarBg: "linear-gradient(135deg, #1e3a5f 0%, #0b1120 100%)",
+    avatarAccent: "#3b82f6",
+    // Avatar icon: briefcase/layers shape for professional
+    icon: (
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <rect x="8" y="16" width="32" height="24" rx="4" stroke="#60a5fa" strokeWidth="2" fill="none"/>
+        <rect x="16" y="10" width="16" height="8" rx="2" stroke="#60a5fa" strokeWidth="2" fill="none"/>
+        <line x1="8" y1="26" x2="40" y2="26" stroke="#60a5fa" strokeWidth="2"/>
+        <circle cx="24" cy="26" r="3" fill="#3b82f6"/>
+      </svg>
+    ),
+  },
+  creative: {
+    id: "creative",
+    label: "CREATIVE",
+    name: "NAVEEN",
+    title: "AI Cinematic Creator",
+    subtitle: "Storyteller · Content Maker · AIWITHNOBRAIN",
+    tags: ["AI Content", "Mythology", "Cinematics"],
+    desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
+    enter: "/creator",
+    enterLabel: "VIEW CREATIVE PROFILE",
+    flipLabel: "SEE PROFESSIONAL SIDE",
+    accent: "#f59e0b",
+    accentSoft: "rgba(245,158,11,",
+    bg: "#110900",
+    cardBg: "rgba(20,12,0,0.95)",
+    avatarBg: "linear-gradient(135deg, #3d1f00 0%, #110900 100%)",
+    avatarAccent: "#f59e0b",
+    // Avatar icon: camera/film shape for creative
+    icon: (
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <rect x="4" y="14" width="30" height="20" rx="4" stroke="#f59e0b" strokeWidth="2" fill="none"/>
+        <path d="M34 20l10-6v20l-10-6V20z" stroke="#f59e0b" strokeWidth="2" fill="none" strokeLinejoin="round"/>
+        <circle cx="19" cy="24" r="5" stroke="#f59e0b" strokeWidth="2" fill="none"/>
+        <circle cx="19" cy="24" r="2" fill="#f59e0b"/>
+      </svg>
+    ),
+  },
+};
+
+// ─── Floating particle ────────────────────────────────────
+function Particle({ accent }: { accent: string }) {
+  const style = {
+    position: "absolute" as const,
+    width: Math.random() * 3 + 1 + "px",
+    height: Math.random() * 3 + 1 + "px",
+    borderRadius: "50%",
+    background: accent,
+    opacity: Math.random() * 0.4 + 0.1,
+    left: Math.random() * 100 + "%",
+    top: Math.random() * 100 + "%",
+    animation: `float-particle ${Math.random() * 8 + 6}s ease-in-out ${Math.random() * 4}s infinite`,
+  };
+  return <div style={style} />;
+}
+
+// ─── Avatar placeholder (swap with <Image> when you have photos) ──
+function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number }) {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        background: side.avatarBg,
+        border: `2px solid ${side.accentSoft}0.2)`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        flexShrink: 0,
+        boxShadow: `0 0 40px ${side.accentSoft}0.15), inset 0 0 30px ${side.accentSoft}0.05)`,
+      }}
+    >
+      {/* Outer ring */}
+      <div style={{
+        position: "absolute", inset: -6, borderRadius: "50%",
+        border: `1px solid ${side.accentSoft}0.15)`,
+      }} />
+      {/* Inner ring */}
+      <div style={{
+        position: "absolute", inset: -12, borderRadius: "50%",
+        border: `1px solid ${side.accentSoft}0.07)`,
+      }} />
+      {/* Icon */}
+      {side.icon}
+      {/*
+        TO ADD YOUR REAL PHOTO:
+        Replace the icon above with:
+        <img src="/naveen-pro.jpg" (or naveen-creative.jpg)
+          style={{ width:"100%", height:"100%", borderRadius:"50%", objectFit:"cover" }}
+        />
+      */}
+    </div>
+  );
+}
+
+// ─── The flip card ────────────────────────────────────────
+export default function HomeV2() {
+  const [flipped, setFlipped] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [bgReady, setBgReady] = useState(false);
+
+  const current = flipped ? SIDES.creative : SIDES.pro;
+
+  useEffect(() => {
+    setBgReady(true);
+  }, []);
+
+  const handleFlip = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 900);
+    setFlipped(f => !f);
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: flipped ? SIDES.creative.bg : SIDES.pro.bg,
+        transition: "background 0.9s cubic-bezier(0.4,0,0.2,1)",
+        position: "relative",
+        overflow: "hidden",
+        padding: "20px",
+      }}
+    >
+      {/* Ambient particles */}
+      {bgReady && Array.from({ length: 18 }).map((_, i) => (
+        <Particle key={i} accent={current.accent} />
+      ))}
+
+      {/* Large ambient glow behind card */}
+      <div style={{
+        position: "absolute",
+        width: 600,
+        height: 600,
+        borderRadius: "50%",
+        background: `radial-gradient(circle, ${current.accentSoft}0.08) 0%, transparent 70%)`,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%,-50%)",
+        transition: "background 0.9s ease",
+        pointerEvents: "none",
+      }} />
+
+      {/* Top wordmark */}
+      <div style={{
+        position: "absolute",
+        top: 28,
+        left: "50%",
+        transform: "translateX(-50%)",
+        fontFamily: "var(--font-mono)",
+        fontSize: 11,
+        letterSpacing: "0.4em",
+        color: `${current.accentSoft}0.35)`,
+        transition: "color 0.9s ease",
+        whiteSpace: "nowrap",
+      }}>
+        NAVEEN TATIKAYALA
+      </div>
+
+      {/* ── The 3D flip card container ── */}
+      <div style={{ perspective: "1200px", width: "100%", maxWidth: 400 }}>
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            transformStyle: "preserve-3d",
+            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+            transition: "transform 0.85s cubic-bezier(0.4,0,0.2,1)",
+          }}
+        >
+          {/* ── FRONT: Professional ── */}
+          <CardFace side={SIDES.pro} onFlip={handleFlip} hidden={false} />
+
+          {/* ── BACK: Creative ── */}
+          <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} />
+        </div>
+      </div>
+
+      {/* Side indicator dots */}
+      <div style={{ display: "flex", gap: 8, marginTop: 28, position: "relative", zIndex: 10 }}>
+        {[false, true].map((isCreative) => (
+          <button
+            key={String(isCreative)}
+            onClick={() => { if (flipped !== isCreative) handleFlip(); }}
+            style={{
+              width: flipped === isCreative ? 24 : 8,
+              height: 8,
+              borderRadius: 4,
+              background: flipped === isCreative ? current.accent : "rgba(255,255,255,0.15)",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.4s ease",
+              padding: 0,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Hint text */}
+      <p style={{
+        position: "relative", zIndex: 10,
+        marginTop: 14,
+        fontFamily: "var(--font-mono)",
+        fontSize: 9,
+        letterSpacing: "0.2em",
+        color: "rgba(255,255,255,0.2)",
+      }}>
+        {flipped ? "CREATIVE SIDE" : "PROFESSIONAL SIDE"}
+      </p>
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes float-particle {
+          0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.1; }
+          33% { transform: translateY(-20px) translateX(10px); opacity: 0.4; }
+          66% { transform: translateY(-10px) translateX(-8px); opacity: 0.2; }
+        }
+        @keyframes pulse-dot {
+          0%, 100% { transform: scale(1); opacity: 0.7; }
+          50% { transform: scale(1.4); opacity: 1; }
+        }
+        @keyframes enter-glow {
+          0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+          50% { box-shadow: 0 0 40px var(--accent-glow); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Single card face ─────────────────────────────────────
+function CardFace({
+  side,
+  onFlip,
+  hidden,
+}: {
+  side: typeof SIDES.pro;
+  onFlip: () => void;
+  hidden: boolean;
+}) {
+  return (
+    <div
+      style={{
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        transform: hidden ? "rotateY(180deg)" : "rotateY(0deg)",
+        position: hidden ? "absolute" : "relative",
+        top: 0, left: 0, width: "100%",
+        background: side.cardBg,
+        border: `1px solid ${side.accentSoft}0.12)`,
+        borderRadius: 24,
+        padding: "36px 32px 28px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0,
+        boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${side.accentSoft}0.06)`,
+      }}
+    >
+      {/* Label pill */}
+      <div style={{
+        fontFamily: "var(--font-mono)",
+        fontSize: 9,
+        letterSpacing: "0.35em",
+        color: `${side.accentSoft}0.6)`,
+        background: `${side.accentSoft}0.06)`,
+        border: `1px solid ${side.accentSoft}0.12)`,
+        borderRadius: 50,
+        padding: "4px 14px",
+        marginBottom: 24,
+      }}>
+        {side.label}
+      </div>
+
+      {/* Avatar */}
+      <Avatar side={side} size={130} />
+
+      {/* Name */}
+      <div style={{
+        fontFamily: "var(--font-display)",
+        fontSize: "clamp(2.8rem, 8vw, 3.8rem)",
+        color: "#f1f5f9",
+        letterSpacing: "0.06em",
+        lineHeight: 1,
+        marginTop: 22,
+        marginBottom: 4,
+      }}>
+        {side.name}
+      </div>
+
+      {/* Title */}
+      <div style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 16,
+        color: side.accent,
+        fontWeight: 500,
+        marginBottom: 4,
+        textAlign: "center",
+      }}>
+        {side.title}
+      </div>
+
+      {/* Subtitle */}
+      <div style={{
+        fontFamily: "var(--font-mono)",
+        fontSize: 10,
+        letterSpacing: "0.12em",
+        color: "rgba(148,163,184,0.45)",
+        marginBottom: 20,
+        textAlign: "center",
+      }}>
+        {side.subtitle}
+      </div>
+
+      {/* Divider */}
+      <div style={{ width: "100%", height: 1, background: `${side.accentSoft}0.08)`, marginBottom: 20 }} />
+
+      {/* Tags */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 18 }}>
+        {side.tags.map(t => (
+          <span key={t} style={{
+            fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.12em",
+            color: `${side.accentSoft}0.7)`,
+            background: `${side.accentSoft}0.06)`,
+            border: `1px solid ${side.accentSoft}0.15)`,
+            borderRadius: 50, padding: "4px 12px",
+          }}>{t}</span>
+        ))}
+      </div>
+
+      {/* Desc */}
+      <p style={{
+        fontFamily: "var(--font-body)",
+        fontSize: 13,
+        lineHeight: 1.7,
+        color: "rgba(148,163,184,0.55)",
+        textAlign: "center",
+        marginBottom: 26,
+        maxWidth: 300,
+      }}>
+        {side.desc}
+      </p>
+
+      {/* ENTER button */}
+      <Link
+        href={side.enter}
+        style={{
+          display: "block",
+          width: "100%",
+          textAlign: "center",
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          color: "#fff",
+          background: side.accent,
+          borderRadius: 50,
+          padding: "14px 24px",
+          textDecoration: "none",
+          transition: "all 0.3s ease",
+          marginBottom: 12,
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 8px 32px ${side.accentSoft}0.35)`;
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLAnchorElement).style.transform = "none";
+          (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+        }}
+      >
+        {side.enterLabel} →
+      </Link>
+
+      {/* Flip button */}
+      <button
+        onClick={onFlip}
+        style={{
+          width: "100%",
+          fontFamily: "var(--font-mono)",
+          fontSize: 10,
+          letterSpacing: "0.18em",
+          color: `${side.accentSoft}0.55)`,
+          background: "transparent",
+          border: `1px solid ${side.accentSoft}0.12)`,
+          borderRadius: 50,
+          padding: "11px 24px",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLButtonElement).style.color = side.accent;
+          (e.currentTarget as HTMLButtonElement).style.borderColor = `${side.accentSoft}0.35)`;
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.color = `${side.accentSoft}0.55)`;
+          (e.currentTarget as HTMLButtonElement).style.borderColor = `${side.accentSoft}0.12)`;
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M1 4v6h6M23 20v-6h-6"/>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+        </svg>
+        {side.flipLabel}
+      </button>
+    </div>
+  );
+}
