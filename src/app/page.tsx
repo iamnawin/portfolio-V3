@@ -263,10 +263,10 @@ export default function HomeV2() {
             }}
           >
             {/* ── FRONT: Professional ── */}
-            <CardFace side={SIDES.pro} onFlip={handleFlip} hidden={false} />
+            <CardFace side={SIDES.pro} onFlip={handleFlip} hidden={false} flipped={flipped} />
 
             {/* ── BACK: Creative ── */}
-            <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} />
+            <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} flipped={flipped} />
           </motion.div>
         </div>
       </motion.div>
@@ -336,12 +336,16 @@ function CardFace({
   side,
   onFlip,
   hidden,
+  flipped,
 }: {
   side: typeof SIDES.pro;
   onFlip: () => void;
   hidden: boolean;
+  flipped: boolean;
 }) {
   const isCreative = side.id === "creative";
+  // pill position: creative side always shows creative, pro side slides based on flipped state
+  const pillOnCreative = isCreative ? true : flipped;
   return (
     <div
       style={{
@@ -391,9 +395,9 @@ function CardFace({
         {/* Sliding background pill */}
         <motion.div
           animate={{
-            x: isCreative ? "100%" : "0%",
-            background: isCreative ? SIDES.creative.accent : SIDES.pro.accent,
-            boxShadow: isCreative
+            x: pillOnCreative ? "100%" : "0%",
+            background: pillOnCreative ? SIDES.creative.accent : SIDES.pro.accent,
+            boxShadow: pillOnCreative
               ? `0 2px 14px ${SIDES.creative.accentSoft}0.45)`
               : `0 2px 14px ${SIDES.pro.accentSoft}0.45)`,
           }}
@@ -409,7 +413,7 @@ function CardFace({
         />
         {/* PRO button */}
         <button
-          onClick={isCreative ? onFlip : undefined}
+          onClick={pillOnCreative ? onFlip : undefined}
           style={{
             flex: 1,
             fontFamily: "var(--font-mono)",
@@ -418,9 +422,9 @@ function CardFace({
             borderRadius: 50,
             padding: "7px 18px",
             border: "none",
-            cursor: isCreative ? "pointer" : "default",
+            cursor: pillOnCreative ? "pointer" : "default",
             background: "transparent",
-            color: !isCreative ? "#fff" : "rgba(148,163,184,0.4)",
+            color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
             transition: "color 0.3s ease",
             position: "relative",
             zIndex: 1,
@@ -430,7 +434,7 @@ function CardFace({
         </button>
         {/* CREATIVE button */}
         <button
-          onClick={!isCreative ? onFlip : undefined}
+          onClick={!pillOnCreative ? onFlip : undefined}
           style={{
             flex: 1,
             fontFamily: "var(--font-mono)",
@@ -439,9 +443,9 @@ function CardFace({
             borderRadius: 50,
             padding: "7px 18px",
             border: "none",
-            cursor: !isCreative ? "pointer" : "default",
+            cursor: !pillOnCreative ? "pointer" : "default",
             background: "transparent",
-            color: isCreative ? "#fff" : "rgba(148,163,184,0.4)",
+            color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
             transition: "color 0.3s ease",
             position: "relative",
             zIndex: 1,
