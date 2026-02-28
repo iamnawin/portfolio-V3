@@ -119,7 +119,7 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            objectPosition: "center top",
+            objectPosition: "center 15%",
             borderRadius: "50%",
           }}
         />
@@ -280,6 +280,7 @@ function CardFace({
   onFlip: () => void;
   hidden: boolean;
 }) {
+  const isCreative = side.id === "creative";
   return (
     <div
       style={{
@@ -291,7 +292,7 @@ function CardFace({
         background: side.cardBg,
         border: `1px solid ${side.accentSoft}0.12)`,
         borderRadius: 24,
-        padding: "36px 32px 28px",
+        padding: "28px 32px 28px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -299,19 +300,54 @@ function CardFace({
         boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${side.accentSoft}0.06)`,
       }}
     >
-      {/* Label pill */}
+      {/* ── Toggle switch (PRO | CREATIVE) ── */}
       <div style={{
-        fontFamily: "var(--font-mono)",
-        fontSize: 9,
-        letterSpacing: "0.35em",
-        color: `${side.accentSoft}0.6)`,
-        background: `${side.accentSoft}0.06)`,
-        border: `1px solid ${side.accentSoft}0.12)`,
+        display: "flex",
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: 50,
-        padding: "4px 14px",
-        marginBottom: 24,
+        padding: 4,
+        marginBottom: 22,
+        gap: 2,
       }}>
-        {side.label}
+        {/* PRO tab */}
+        <button
+          onClick={isCreative ? onFlip : undefined}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 9,
+            letterSpacing: "0.22em",
+            borderRadius: 50,
+            padding: "7px 18px",
+            border: "none",
+            cursor: isCreative ? "pointer" : "default",
+            background: !isCreative ? SIDES.pro.accent : "transparent",
+            color: !isCreative ? "#fff" : "rgba(148,163,184,0.35)",
+            transition: "all 0.35s ease",
+            boxShadow: !isCreative ? `0 2px 12px ${SIDES.pro.accentSoft}0.4)` : "none",
+          }}
+        >
+          PRO
+        </button>
+        {/* CREATIVE tab */}
+        <button
+          onClick={!isCreative ? onFlip : undefined}
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 9,
+            letterSpacing: "0.22em",
+            borderRadius: 50,
+            padding: "7px 18px",
+            border: "none",
+            cursor: !isCreative ? "pointer" : "default",
+            background: isCreative ? SIDES.creative.accent : "transparent",
+            color: isCreative ? "#fff" : "rgba(148,163,184,0.35)",
+            transition: "all 0.35s ease",
+            boxShadow: isCreative ? `0 2px 12px ${SIDES.creative.accentSoft}0.4)` : "none",
+          }}
+        >
+          CREATIVE
+        </button>
       </div>
 
       {/* Avatar */}
@@ -413,41 +449,6 @@ function CardFace({
         {side.enterLabel} →
       </Link>
 
-      {/* Flip button */}
-      <button
-        onClick={onFlip}
-        style={{
-          width: "100%",
-          fontFamily: "var(--font-mono)",
-          fontSize: 10,
-          letterSpacing: "0.18em",
-          color: `${side.accentSoft}0.55)`,
-          background: "transparent",
-          border: `1px solid ${side.accentSoft}0.12)`,
-          borderRadius: 50,
-          padding: "11px 24px",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-        }}
-        onMouseEnter={e => {
-          (e.currentTarget as HTMLButtonElement).style.color = side.accent;
-          (e.currentTarget as HTMLButtonElement).style.borderColor = `${side.accentSoft}0.35)`;
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLButtonElement).style.color = `${side.accentSoft}0.55)`;
-          (e.currentTarget as HTMLButtonElement).style.borderColor = `${side.accentSoft}0.12)`;
-        }}
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-          <path d="M1 4v6h6M23 20v-6h-6"/>
-          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-        </svg>
-        {side.flipLabel}
-      </button>
     </div>
   );
 }
