@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Naveen | AI-Driven Application Designer",
+  title: "Naveen | AI-Driven Application Solutions Designer",
   description:
     "Enterprise architecture, intelligent automation, and scalable application design.",
 };
