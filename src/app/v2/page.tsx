@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 // ─── Profile data for each side ───────────────────────────
 const SIDES = {
@@ -133,7 +134,6 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
 // ─── The flip card ────────────────────────────────────────
 export default function HomeV2() {
   const [flipped, setFlipped] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [bgReady, setBgReady] = useState(false);
 
   const current = flipped ? SIDES.creative : SIDES.pro;
@@ -142,12 +142,7 @@ export default function HomeV2() {
     setBgReady(true);
   }, []);
 
-  const handleFlip = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setTimeout(() => setIsAnimating(false), 900);
-    setFlipped(f => !f);
-  };
+  const handleFlip = () => setFlipped(f => !f);
 
   return (
     <div
@@ -200,14 +195,19 @@ export default function HomeV2() {
       </div>
 
       {/* ── The 3D flip card container ── */}
-      <div style={{ perspective: "1200px", width: "100%", maxWidth: 400 }}>
-        <div
+      <div style={{ perspective: "1000px", width: "100%", maxWidth: 400 }}>
+        <motion.div
           style={{
             position: "relative",
             width: "100%",
             transformStyle: "preserve-3d",
-            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-            transition: "transform 0.85s cubic-bezier(0.4,0,0.2,1)",
+          }}
+          animate={{ rotateY: flipped ? 180 : 0 }}
+          transition={{
+            type: "spring",
+            stiffness: 80,
+            damping: 16,
+            mass: 0.9,
           }}
         >
           {/* ── FRONT: Professional ── */}
@@ -215,7 +215,7 @@ export default function HomeV2() {
 
           {/* ── BACK: Creative ── */}
           <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} />
-        </div>
+        </motion.div>
       </div>
 
       {/* Side indicator dots */}
