@@ -178,45 +178,49 @@ export default function HomeV2() {
         pointerEvents: "none",
       }} />
 
-      {/* Top wordmark */}
-      <div style={{
-        position: "absolute",
-        top: 28,
-        left: "50%",
-        transform: "translateX(-50%)",
-        fontFamily: "var(--font-mono)",
-        fontSize: 11,
-        letterSpacing: "0.4em",
-        color: `${current.accentSoft}0.35)`,
-        transition: "color 0.9s ease",
-        whiteSpace: "nowrap",
-      }}>
-        NAVEEN TATIKAYALA
-      </div>
-
-      {/* ── The 3D flip card container ── */}
-      <div style={{ perspective: "1000px", width: "100%", maxWidth: 400 }}>
+      {/* ── The 3D flip card container with float ── */}
+      <motion.div
+        animate={{ y: [0, -10, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        style={{ width: "100%", maxWidth: 400, position: "relative", zIndex: 10 }}
+      >
+        {/* Pulsing glow halo behind the card */}
         <motion.div
+          animate={{ opacity: [0.5, 1, 0.5], scale: [0.97, 1.02, 0.97] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            position: "relative",
-            width: "100%",
-            transformStyle: "preserve-3d",
+            position: "absolute",
+            inset: -2,
+            borderRadius: 26,
+            background: `radial-gradient(ellipse at 50% 0%, ${current.accentSoft}0.18) 0%, transparent 70%)`,
+            filter: "blur(12px)",
+            pointerEvents: "none",
+            transition: "background 0.9s ease",
           }}
-          animate={{ rotateY: flipped ? 180 : 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 80,
-            damping: 16,
-            mass: 0.9,
-          }}
-        >
-          {/* ── FRONT: Professional ── */}
-          <CardFace side={SIDES.pro} onFlip={handleFlip} hidden={false} />
+        />
+        <div style={{ perspective: "1000px", width: "100%" }}>
+          <motion.div
+            style={{
+              position: "relative",
+              width: "100%",
+              transformStyle: "preserve-3d",
+            }}
+            animate={{ rotateY: flipped ? 180 : 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 16,
+              mass: 0.9,
+            }}
+          >
+            {/* ── FRONT: Professional ── */}
+            <CardFace side={SIDES.pro} onFlip={handleFlip} hidden={false} />
 
-          {/* ── BACK: Creative ── */}
-          <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} />
-        </motion.div>
-      </div>
+            {/* ── BACK: Creative ── */}
+            <CardFace side={SIDES.creative} onFlip={handleFlip} hidden={true} />
+          </motion.div>
+        </div>
+      </motion.div>
 
       {/* Side indicator dots */}
       <div style={{ display: "flex", gap: 8, marginTop: 28, position: "relative", zIndex: 10 }}>
@@ -238,16 +242,18 @@ export default function HomeV2() {
         ))}
       </div>
 
-      {/* Hint text */}
+      {/* Wordmark */}
       <p style={{
         position: "relative", zIndex: 10,
-        marginTop: 14,
+        marginTop: 16,
         fontFamily: "var(--font-mono)",
-        fontSize: 9,
-        letterSpacing: "0.2em",
-        color: "rgba(255,255,255,0.2)",
+        fontSize: 10,
+        letterSpacing: "0.4em",
+        color: `${current.accentSoft}0.3)`,
+        transition: "color 0.9s ease",
+        whiteSpace: "nowrap",
       }}>
-        {flipped ? "CREATIVE SIDE" : "PROFESSIONAL SIDE"}
+        NAVEEN TATIKAYALA
       </p>
 
       {/* Keyframes */}
@@ -257,13 +263,15 @@ export default function HomeV2() {
           33% { transform: translateY(-20px) translateX(10px); opacity: 0.4; }
           66% { transform: translateY(-10px) translateX(-8px); opacity: 0.2; }
         }
-        @keyframes pulse-dot {
-          0%, 100% { transform: scale(1); opacity: 0.7; }
-          50% { transform: scale(1.4); opacity: 1; }
+        @keyframes shimmer-sweep {
+          0%   { transform: rotate(15deg) translateX(-120%); opacity: 0; }
+          10%  { opacity: 1; }
+          60%  { opacity: 1; }
+          100% { transform: rotate(15deg) translateX(350%); opacity: 0; }
         }
-        @keyframes enter-glow {
-          0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
-          50% { box-shadow: 0 0 40px var(--accent-glow); }
+        @keyframes border-glow {
+          0%, 100% { box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(255,255,255,0.03); }
+          50%       { box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.14), 0 0 40px rgba(255,255,255,0.06); }
         }
       `}</style>
     </div>
@@ -297,9 +305,25 @@ function CardFace({
         flexDirection: "column",
         alignItems: "center",
         gap: 0,
-        boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${side.accentSoft}0.06)`,
+        boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${side.accentSoft}0.12)`,
+        animation: "border-glow 4s ease-in-out infinite",
       }}
     >
+      {/* Shimmer sweep overlay */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        borderRadius: 24, overflow: "hidden", pointerEvents: "none", zIndex: 0,
+      }}>
+        <div style={{
+          position: "absolute",
+          top: "-80%", left: "-60%",
+          width: "40%", height: "260%",
+          background: `linear-gradient(105deg, transparent 30%, ${side.accentSoft}0.07) 50%, transparent 70%)`,
+          transform: "rotate(15deg)",
+          animation: "shimmer-sweep 6s ease-in-out infinite",
+        }} />
+      </div>
+
       {/* ── Toggle switch (PRO | CREATIVE) ── */}
       <div style={{
         display: "flex",
