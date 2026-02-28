@@ -131,10 +131,36 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
   );
 }
 
+// ─── Whoosh sound via Web Audio API ────────────────────────
+function playFlipSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const dur = 0.45;
+    const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 1.5);
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(1400, ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + dur);
+    filter.Q.value = 0.6;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.22, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+    src.start();
+  } catch { /* silent fail */ }
+}
+
 // ─── The flip card ────────────────────────────────────────
 export default function HomeV2() {
   const [flipped, setFlipped] = useState(false);
   const [bgReady, setBgReady] = useState(false);
+  const [ripples, setRipples] = useState<number[]>([]);
 
   const current = flipped ? SIDES.creative : SIDES.pro;
 
@@ -142,7 +168,13 @@ export default function HomeV2() {
     setBgReady(true);
   }, []);
 
-  const handleFlip = () => setFlipped(f => !f);
+  const handleFlip = () => {
+    playFlipSound();
+    const id = Date.now();
+    setRipples(prev => [...prev, id]);
+    setTimeout(() => setRipples(prev => prev.filter(r => r !== id)), 1000);
+    setFlipped(f => !f);
+  };
 
   return (
     <div
@@ -177,6 +209,23 @@ export default function HomeV2() {
         transition: "background 0.9s ease",
         pointerEvents: "none",
       }} />
+
+      {/* Water ripple rings on flip */}
+      {ripples.map(id => (
+        <div key={id} style={{ position: "absolute", top: "50%", left: "50%", pointerEvents: "none", zIndex: 20 }}>
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{
+              position: "absolute",
+              borderRadius: "50%",
+              border: `1px solid ${current.accent}`,
+              width: 120, height: 120,
+              top: "50%", left: "50%",
+              transform: "translate(-50%, -50%)",
+              animation: `water-ripple 1s ease-out ${i * 0.18}s forwards`,
+            }} />
+          ))}
+        </div>
+      ))}
 
       {/* ── The 3D flip card container with float ── */}
       <motion.div
@@ -273,6 +322,10 @@ export default function HomeV2() {
           0%, 100% { box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(255,255,255,0.03); }
           50%       { box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.14), 0 0 40px rgba(255,255,255,0.06); }
         }
+        @keyframes water-ripple {
+          0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+          100% { transform: translate(-50%, -50%) scale(7); opacity: 0; }
+        }
       `}</style>
     </div>
   );
@@ -324,7 +377,7 @@ function CardFace({
         }} />
       </div>
 
-      {/* ── Toggle switch (PRO | CREATIVE) ── */}
+      {/* ── Toggle switch (PRO | CREATIVE) — sliding pill ── */}
       <div style={{
         display: "flex",
         background: "rgba(255,255,255,0.04)",
@@ -332,12 +385,33 @@ function CardFace({
         borderRadius: 50,
         padding: 4,
         marginBottom: 22,
-        gap: 2,
+        position: "relative",
+        zIndex: 1,
       }}>
-        {/* PRO tab */}
+        {/* Sliding background pill */}
+        <motion.div
+          animate={{
+            x: isCreative ? "100%" : "0%",
+            background: isCreative ? SIDES.creative.accent : SIDES.pro.accent,
+            boxShadow: isCreative
+              ? `0 2px 14px ${SIDES.creative.accentSoft}0.45)`
+              : `0 2px 14px ${SIDES.pro.accentSoft}0.45)`,
+          }}
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+          style={{
+            position: "absolute",
+            top: 4, bottom: 4,
+            left: 4,
+            width: "calc(50% - 4px)",
+            borderRadius: 50,
+            pointerEvents: "none",
+          }}
+        />
+        {/* PRO button */}
         <button
           onClick={isCreative ? onFlip : undefined}
           style={{
+            flex: 1,
             fontFamily: "var(--font-mono)",
             fontSize: 9,
             letterSpacing: "0.22em",
@@ -345,18 +419,20 @@ function CardFace({
             padding: "7px 18px",
             border: "none",
             cursor: isCreative ? "pointer" : "default",
-            background: !isCreative ? SIDES.pro.accent : "transparent",
-            color: !isCreative ? "#fff" : "rgba(148,163,184,0.35)",
-            transition: "all 0.35s ease",
-            boxShadow: !isCreative ? `0 2px 12px ${SIDES.pro.accentSoft}0.4)` : "none",
+            background: "transparent",
+            color: !isCreative ? "#fff" : "rgba(148,163,184,0.4)",
+            transition: "color 0.3s ease",
+            position: "relative",
+            zIndex: 1,
           }}
         >
           PRO
         </button>
-        {/* CREATIVE tab */}
+        {/* CREATIVE button */}
         <button
           onClick={!isCreative ? onFlip : undefined}
           style={{
+            flex: 1,
             fontFamily: "var(--font-mono)",
             fontSize: 9,
             letterSpacing: "0.22em",
@@ -364,10 +440,11 @@ function CardFace({
             padding: "7px 18px",
             border: "none",
             cursor: !isCreative ? "pointer" : "default",
-            background: isCreative ? SIDES.creative.accent : "transparent",
-            color: isCreative ? "#fff" : "rgba(148,163,184,0.35)",
-            transition: "all 0.35s ease",
-            boxShadow: isCreative ? `0 2px 12px ${SIDES.creative.accentSoft}0.4)` : "none",
+            background: "transparent",
+            color: isCreative ? "#fff" : "rgba(148,163,184,0.4)",
+            transition: "color 0.3s ease",
+            position: "relative",
+            zIndex: 1,
           }}
         >
           CREATIVE
