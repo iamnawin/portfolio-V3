@@ -22,7 +22,7 @@ const SIDES = {
     cardBg: "rgba(11,17,32,0.95)",
     avatarBg: "linear-gradient(135deg, #1e3a5f 0%, #0b1120 100%)",
     avatarAccent: "#3b82f6",
-    photo: "/naveen-pro.jpg",
+    photo: "/naveen-pro.jpg?v=2",
     icon: (
       <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
         <rect x="8" y="16" width="32" height="24" rx="4" stroke="#60a5fa" strokeWidth="2" fill="none"/>
