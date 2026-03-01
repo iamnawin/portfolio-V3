@@ -194,22 +194,6 @@ export default function HomeV2() {
         pointerEvents: "none",
       }} />
 
-      {/* Water ripple rings on flip */}
-      {ripples.map(id => (
-        <div key={id} style={{ position: "absolute", top: "50%", left: "50%", pointerEvents: "none", zIndex: 20 }}>
-          {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              position: "absolute",
-              borderRadius: "50%",
-              border: `1px solid ${current.accent}`,
-              width: 120, height: 120,
-              top: "50%", left: "50%",
-              transform: "translate(-50%, -50%)",
-              animation: `water-ripple 1s ease-out ${i * 0.18}s forwards`,
-            }} />
-          ))}
-        </div>
-      ))}
 
       {/* ── The 3D flip card container with float ── */}
       <motion.div
@@ -217,6 +201,23 @@ export default function HomeV2() {
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         style={{ width: "100%", maxWidth: 400, position: "relative", zIndex: 10 }}
       >
+        {/* Water ripple — subtle, originates near toggle area */}
+        {ripples.map(id => (
+          <div key={id} style={{ position: "absolute", top: "12%", left: "50%", pointerEvents: "none", zIndex: 30 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                position: "absolute",
+                borderRadius: "50%",
+                border: `0.5px solid ${current.accent}`,
+                width: 56, height: 56,
+                top: "50%", left: "50%",
+                transform: "translate(-50%, -50%)",
+                animation: `water-ripple 1.8s ease-out ${i * 0.28}s forwards`,
+              }} />
+            ))}
+          </div>
+        ))}
+
         {/* Pulsing glow halo behind the card */}
         <motion.div
           animate={{ opacity: [0.5, 1, 0.5], scale: [0.97, 1.02, 0.97] }}
@@ -307,8 +308,9 @@ export default function HomeV2() {
           50%       { box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.14), 0 0 40px rgba(255,255,255,0.06); }
         }
         @keyframes water-ripple {
-          0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
-          100% { transform: translate(-50%, -50%) scale(7); opacity: 0; }
+          0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+          50%  { opacity: 0.15; }
+          100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
         }
       `}</style>
     </div>
@@ -366,24 +368,30 @@ function CardFace({
       </div>
 
       {/* ── Toggle switch (PRO | CREATIVE) — sliding pill ── */}
-      <div style={{
-        display: "flex",
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: 50,
-        padding: 4,
-        marginBottom: 22,
-        position: "relative",
-        zIndex: 1,
-      }}>
+      <div
+        onClick={onFlip}
+        title="Switch profile"
+        style={{
+          display: "flex",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 50,
+          padding: 4,
+          marginBottom: 6,
+          position: "relative",
+          zIndex: 1,
+          cursor: "pointer",
+          userSelect: "none" as const,
+        }}
+      >
         {/* Sliding background pill */}
         <motion.div
           animate={{
             x: pillOnCreative ? "100%" : "0%",
             background: pillOnCreative ? SIDES.creative.accent : SIDES.pro.accent,
             boxShadow: pillOnCreative
-              ? `0 2px 14px ${SIDES.creative.accentSoft}0.45)`
-              : `0 2px 14px ${SIDES.pro.accentSoft}0.45)`,
+              ? `inset 0 1px 8px ${SIDES.creative.accentSoft}0.3)`
+              : `inset 0 1px 8px ${SIDES.pro.accentSoft}0.3)`,
           }}
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
           style={{
@@ -395,49 +403,52 @@ function CardFace({
             pointerEvents: "none",
           }}
         />
-        {/* PRO button */}
-        <button
-          onClick={pillOnCreative ? onFlip : undefined}
-          style={{
-            flex: 1,
-            fontFamily: "var(--font-mono)",
-            fontSize: 9,
-            letterSpacing: "0.22em",
-            borderRadius: 50,
-            padding: "7px 18px",
-            border: "none",
-            cursor: pillOnCreative ? "pointer" : "default",
-            background: "transparent",
-            color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-            transition: "color 0.3s ease",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        {/* PRO label */}
+        <span style={{
+          flex: 1,
+          fontFamily: "var(--font-mono)",
+          fontSize: 9,
+          letterSpacing: "0.22em",
+          borderRadius: 50,
+          padding: "7px 18px",
+          textAlign: "center",
+          color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
+          transition: "color 0.3s ease",
+          position: "relative",
+          zIndex: 1,
+        }}>
           PRO
-        </button>
-        {/* CREATIVE button */}
-        <button
-          onClick={!pillOnCreative ? onFlip : undefined}
-          style={{
-            flex: 1,
-            fontFamily: "var(--font-mono)",
-            fontSize: 9,
-            letterSpacing: "0.22em",
-            borderRadius: 50,
-            padding: "7px 18px",
-            border: "none",
-            cursor: !pillOnCreative ? "pointer" : "default",
-            background: "transparent",
-            color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-            transition: "color 0.3s ease",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        </span>
+        {/* CREATIVE label */}
+        <span style={{
+          flex: 1,
+          fontFamily: "var(--font-mono)",
+          fontSize: 9,
+          letterSpacing: "0.22em",
+          borderRadius: 50,
+          padding: "7px 18px",
+          textAlign: "center",
+          color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
+          transition: "color 0.3s ease",
+          position: "relative",
+          zIndex: 1,
+        }}>
           CREATIVE
-        </button>
+        </span>
       </div>
+
+      {/* Hint */}
+      <p style={{
+        fontFamily: "var(--font-mono)",
+        fontSize: 8,
+        letterSpacing: "0.2em",
+        color: "rgba(255,255,255,0.18)",
+        textAlign: "center",
+        marginBottom: 18,
+        marginTop: 0,
+        position: "relative",
+        zIndex: 1,
+      }}>↔ TAP TO SWITCH</p>
 
       {/* Avatar */}
       <Avatar side={side} size={130} />
