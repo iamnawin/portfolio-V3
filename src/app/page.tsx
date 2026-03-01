@@ -144,7 +144,7 @@ function playFlipSound() {
 export default function HomeV2() {
   const [flipped, setFlipped] = useState(false);
   const [bgReady, setBgReady] = useState(false);
-  const [ripples, setRipples] = useState<number[]>([]);
+  const [sparks, setSparks] = useState<number[]>([]);
 
   const current = flipped ? SIDES.creative : SIDES.pro;
 
@@ -155,8 +155,8 @@ export default function HomeV2() {
   const handleFlip = () => {
     playFlipSound();
     const id = Date.now();
-    setRipples(prev => [...prev, id]);
-    setTimeout(() => setRipples(prev => prev.filter(r => r !== id)), 1000);
+    setSparks(prev => [...prev, id]);
+    setTimeout(() => setSparks(prev => prev.filter(s => s !== id)), 700);
     setFlipped(f => !f);
   };
 
@@ -201,20 +201,26 @@ export default function HomeV2() {
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         style={{ width: "100%", maxWidth: 400, position: "relative", zIndex: 10 }}
       >
-        {/* Water ripple — subtle, originates near toggle area */}
-        {ripples.map(id => (
-          <div key={id} style={{ position: "absolute", top: "12%", left: "50%", pointerEvents: "none", zIndex: 30 }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{
-                position: "absolute",
-                borderRadius: "50%",
-                border: `0.5px solid ${current.accent}`,
-                width: 56, height: 56,
-                top: "50%", left: "50%",
-                transform: "translate(-50%, -50%)",
-                animation: `water-ripple 1.8s ease-out ${i * 0.28}s forwards`,
-              }} />
-            ))}
+        {/* Spark burst — fires from toggle area on flip */}
+        {sparks.map(id => (
+          <div key={id} style={{ position: "absolute", top: "11%", left: "50%", pointerEvents: "none", zIndex: 30 }}>
+            {[0,1,2,3,4,5].map(i => {
+              const angle = (i * 60 - 15) * (Math.PI / 180);
+              const dist = 28 + (i % 2) * 16;
+              return (
+                <div key={i} style={{
+                  position: "absolute",
+                  width: i % 2 === 0 ? 3 : 2,
+                  height: i % 2 === 0 ? 3 : 2,
+                  borderRadius: "50%",
+                  background: current.accent,
+                  top: "50%", left: "50%",
+                  ["--spark-tx" as string]: `${Math.cos(angle) * dist}px`,
+                  ["--spark-ty" as string]: `${Math.sin(angle) * dist}px`,
+                  animation: `spark-burst 0.55s ease-out ${i * 0.04}s forwards`,
+                }} />
+              );
+            })}
           </div>
         ))}
 
@@ -307,10 +313,10 @@ export default function HomeV2() {
           0%, 100% { box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(255,255,255,0.03); }
           50%       { box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.14), 0 0 40px rgba(255,255,255,0.06); }
         }
-        @keyframes water-ripple {
-          0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
-          50%  { opacity: 0.15; }
-          100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+        @keyframes spark-burst {
+          0%   { transform: translate(-50%, -50%) translateX(0px) translateY(0px); opacity: 1; }
+          60%  { opacity: 0.5; }
+          100% { transform: translate(-50%, -50%) translateX(var(--spark-tx)) translateY(var(--spark-ty)); opacity: 0; }
         }
       `}</style>
     </div>
@@ -367,40 +373,41 @@ function CardFace({
         }} />
       </div>
 
-      {/* ── Toggle switch (PRO | CREATIVE) — sliding pill ── */}
+      {/* ── Toggle switch (PRO | CREATIVE) — 3D sliding pill ── */}
       <div
         onClick={onFlip}
         title="Switch profile"
         style={{
           display: "flex",
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 100%)",
           borderRadius: 50,
-          padding: 4,
+          padding: 5,
           marginBottom: 6,
           position: "relative",
           zIndex: 1,
           cursor: "pointer",
           userSelect: "none" as const,
+          boxShadow: "inset 0 2px 8px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06)",
+          overflow: "hidden",
         }}
       >
-        {/* Sliding background pill */}
+        {/* Raised 3D pill */}
         <motion.div
           animate={{
             x: pillOnCreative ? "100%" : "0%",
-            background: pillOnCreative ? SIDES.creative.accent : SIDES.pro.accent,
-            boxShadow: pillOnCreative
-              ? `inset 0 1px 8px ${SIDES.creative.accentSoft}0.3)`
-              : `inset 0 1px 8px ${SIDES.pro.accentSoft}0.3)`,
+            background: pillOnCreative
+              ? "linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%)"
+              : "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
           }}
           transition={{ type: "spring", stiffness: 380, damping: 30 }}
           style={{
             position: "absolute",
-            top: 4, bottom: 4,
-            left: 4,
-            width: "calc(50% - 4px)",
+            top: 5, bottom: 5,
+            left: 5,
+            width: "calc(50% - 7px)",
             borderRadius: 50,
             pointerEvents: "none",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(0,0,0,0.15)",
           }}
         />
         {/* PRO label */}
@@ -409,11 +416,12 @@ function CardFace({
           fontFamily: "var(--font-mono)",
           fontSize: 9,
           letterSpacing: "0.22em",
-          borderRadius: 50,
           padding: "7px 18px",
           textAlign: "center",
           color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-          transition: "color 0.3s ease",
+          fontWeight: !pillOnCreative ? 600 : 400,
+          textShadow: !pillOnCreative ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
+          transition: "color 0.3s ease, font-weight 0.3s ease",
           position: "relative",
           zIndex: 1,
         }}>
@@ -425,11 +433,12 @@ function CardFace({
           fontFamily: "var(--font-mono)",
           fontSize: 9,
           letterSpacing: "0.22em",
-          borderRadius: 50,
           padding: "7px 18px",
           textAlign: "center",
           color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-          transition: "color 0.3s ease",
+          fontWeight: pillOnCreative ? 600 : 400,
+          textShadow: pillOnCreative ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
+          transition: "color 0.3s ease, font-weight 0.3s ease",
           position: "relative",
           zIndex: 1,
         }}>
