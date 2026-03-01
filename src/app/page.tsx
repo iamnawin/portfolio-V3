@@ -335,7 +335,8 @@ function ToggleSwitch({
 }) {
   const dragStartX = useRef<number | null>(null);
 
-  const handlePointerDown = (e: { clientX: number }) => {
+  const handlePointerDown = (e: PointerEvent & { currentTarget: Element }) => {
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
     dragStartX.current = e.clientX;
   };
   const handlePointerUp = (e: { clientX: number }) => {
@@ -344,9 +345,9 @@ function ToggleSwitch({
     dragStartX.current = null;
     if (Math.abs(delta) < 8) {
       onFlip(); // tap
-    } else if (delta > 20 && !pillOnCreative) {
+    } else if (delta > 10 && !pillOnCreative) {
       onFlip(); // swipe right → creative
-    } else if (delta < -20 && pillOnCreative) {
+    } else if (delta < -10 && pillOnCreative) {
       onFlip(); // swipe left → pro
     }
   };
@@ -358,6 +359,7 @@ function ToggleSwitch({
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
+        columnGap: 4,
         background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 100%)",
         borderRadius: 50,
         marginBottom: 6,
@@ -381,7 +383,7 @@ function ToggleSwitch({
               inset: 3,
               borderRadius: 50,
               background: "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.35)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.18)",
             }}
           />
         )}
@@ -406,7 +408,7 @@ function ToggleSwitch({
               inset: 3,
               borderRadius: 50,
               background: "linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.35)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.18)",
             }}
           />
         )}
