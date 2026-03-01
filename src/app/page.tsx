@@ -10,7 +10,8 @@ const SIDES = {
     label: "PROFESSIONAL",
     name: "NAVEEN",
     title: "AI Solutions Architect",
-    subtitle: "Business Analyst · Product Analyst · FDE",
+    subtitle: "Business Analyst · Forward Deployed Engineer · Consultant",
+    brands: "",
     tags: ["Salesforce", "LLM & AI", "Automation"],
     desc: "I turn business problems into scalable solutions — AI, Salesforce, and enterprise delivery.",
     enter: "/professional",
@@ -38,7 +39,8 @@ const SIDES = {
     name: "NAVEEN",
     title: "AI Cinematic Enthusiast",
     subtitle: "Storyteller · AI Learner · Founder",
-    tags: ["AIWITHNOBRAIN", "ZeroOrigins", "AI Ads"],
+    brands: "AIWITHNOBRAIN · ZeroOrigins",
+    tags: ["AI Content", "AI Music", "AI Ads"],
     desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
     enter: "/creator",
     enterLabel: "VIEW CREATIVE PROFILE",
@@ -526,11 +528,27 @@ function CardFace({
         fontSize: 10,
         letterSpacing: "0.12em",
         color: "rgba(148,163,184,0.45)",
-        marginBottom: 20,
+        marginBottom: side.brands ? 8 : 20,
         textAlign: "center",
       }}>
         {side.subtitle}
       </div>
+
+      {/* Brands tagline (creative only) */}
+      {side.brands && (
+        <div style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 10,
+          letterSpacing: "0.14em",
+          color: side.accent,
+          fontWeight: 700,
+          marginBottom: 20,
+          textAlign: "center",
+          opacity: 0.85,
+        }}>
+          {side.brands}
+        </div>
+      )}
 
       {/* Divider */}
       <div style={{ width: "100%", height: 1, background: `${side.accentSoft}0.08)`, marginBottom: 20 }} />
