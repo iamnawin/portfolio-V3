@@ -134,7 +134,7 @@ function Avatar({ side, size = 140 }: { side: typeof SIDES.pro; size?: number })
 // ─── Flip sound via MP3 ────────────────────────
 function playFlipSound() {
   try {
-    const audio = new Audio("/flip-sound.mp3");
+    const audio = new Audio("/comedy_pop_finger_in_mouth_001.mp3");
     audio.volume = 0.6;
     audio.play().catch(() => { /* silent fail if blocked */ });
   } catch { /* silent fail */ }
