@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
 
 // ─── Profile data for each side ───────────────────────────
 const SIDES = {
@@ -323,6 +323,105 @@ export default function HomeV2() {
   );
 }
 
+// ─── Toggle switch with layoutId pill (pixel-perfect) ────
+function ToggleSwitch({
+  pillOnCreative,
+  sideId,
+  onFlip,
+}: {
+  pillOnCreative: boolean;
+  sideId: string;
+  onFlip: () => void;
+}) {
+  const dragStartX = useRef<number | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    dragStartX.current = e.clientX;
+  };
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (dragStartX.current === null) return;
+    const delta = e.clientX - dragStartX.current;
+    dragStartX.current = null;
+    if (Math.abs(delta) < 8) {
+      onFlip(); // tap
+    } else if (delta > 20 && !pillOnCreative) {
+      onFlip(); // swipe right → creative
+    } else if (delta < -20 && pillOnCreative) {
+      onFlip(); // swipe left → pro
+    }
+  };
+
+  return (
+    <div
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 100%)",
+        borderRadius: 50,
+        marginBottom: 6,
+        position: "relative",
+        zIndex: 1,
+        cursor: "pointer",
+        userSelect: "none" as const,
+        boxShadow: "inset 0 2px 8px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06)",
+        touchAction: "none",
+      }}
+    >
+      {/* PRO half */}
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "8px 0" }}>
+        {!pillOnCreative && (
+          <motion.div
+            layoutId={`pill-${sideId}`}
+            transition={{ type: "spring", stiffness: 400, damping: 32 }}
+            style={{
+              position: "absolute",
+              inset: 3,
+              borderRadius: 50,
+              background: "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.35)",
+            }}
+          />
+        )}
+        <span style={{
+          position: "relative", zIndex: 1,
+          fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.22em",
+          color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.35)",
+          fontWeight: !pillOnCreative ? 600 : 400,
+          textShadow: !pillOnCreative ? "0 1px 2px rgba(0,0,0,0.6)" : "none",
+          transition: "color 0.3s ease",
+        }}>PRO</span>
+      </div>
+
+      {/* CREATIVE half */}
+      <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: "8px 0" }}>
+        {pillOnCreative && (
+          <motion.div
+            layoutId={`pill-${sideId}`}
+            transition={{ type: "spring", stiffness: 400, damping: 32 }}
+            style={{
+              position: "absolute",
+              inset: 3,
+              borderRadius: 50,
+              background: "linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.35)",
+            }}
+          />
+        )}
+        <span style={{
+          position: "relative", zIndex: 1,
+          fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.22em",
+          color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.35)",
+          fontWeight: pillOnCreative ? 600 : 400,
+          textShadow: pillOnCreative ? "0 1px 2px rgba(0,0,0,0.6)" : "none",
+          transition: "color 0.3s ease",
+        }}>CREATIVE</span>
+      </div>
+    </div>
+  );
+}
+
 // ─── Single card face ─────────────────────────────────────
 function CardFace({
   side,
@@ -373,78 +472,14 @@ function CardFace({
         }} />
       </div>
 
-      {/* ── Toggle switch (PRO | CREATIVE) — 3D sliding pill ── */}
-      <div
-        onClick={onFlip}
-        title="Switch profile"
-        style={{
-          display: "flex",
-          background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 100%)",
-          borderRadius: 50,
-          padding: 5,
-          marginBottom: 6,
-          position: "relative",
-          zIndex: 1,
-          cursor: "pointer",
-          userSelect: "none" as const,
-          boxShadow: "inset 0 2px 8px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06)",
-          overflow: "hidden",
-        }}
-      >
-        {/* Raised 3D pill */}
-        <motion.div
-          animate={{
-            x: pillOnCreative ? "100%" : "0%",
-            background: pillOnCreative
-              ? "linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%)"
-              : "linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%)",
-          }}
-          transition={{ type: "spring", stiffness: 380, damping: 30 }}
-          style={{
-            position: "absolute",
-            top: 5, bottom: 5,
-            left: 5,
-            width: "calc(50% - 7px)",
-            borderRadius: 50,
-            pointerEvents: "none",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(0,0,0,0.15)",
-          }}
+      {/* ── Toggle switch — layoutId pill, swipe + click ── */}
+      <LayoutGroup id={`toggle-${side.id}`}>
+        <ToggleSwitch
+          pillOnCreative={pillOnCreative}
+          sideId={side.id}
+          onFlip={onFlip}
         />
-        {/* PRO label */}
-        <span style={{
-          flex: 1,
-          fontFamily: "var(--font-mono)",
-          fontSize: 9,
-          letterSpacing: "0.22em",
-          padding: "7px 18px",
-          textAlign: "center",
-          color: !pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-          fontWeight: !pillOnCreative ? 600 : 400,
-          textShadow: !pillOnCreative ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
-          transition: "color 0.3s ease, font-weight 0.3s ease",
-          position: "relative",
-          zIndex: 1,
-        }}>
-          PRO
-        </span>
-        {/* CREATIVE label */}
-        <span style={{
-          flex: 1,
-          fontFamily: "var(--font-mono)",
-          fontSize: 9,
-          letterSpacing: "0.22em",
-          padding: "7px 18px",
-          textAlign: "center",
-          color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.4)",
-          fontWeight: pillOnCreative ? 600 : 400,
-          textShadow: pillOnCreative ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
-          transition: "color 0.3s ease, font-weight 0.3s ease",
-          position: "relative",
-          zIndex: 1,
-        }}>
-          CREATIVE
-        </span>
-      </div>
+      </LayoutGroup>
 
       {/* Hint */}
       <p style={{
@@ -457,7 +492,7 @@ function CardFace({
         marginTop: 0,
         position: "relative",
         zIndex: 1,
-      }}>↔ TAP TO SWITCH</p>
+      }}>↔ SLIDE OR TAP</p>
 
       {/* Avatar */}
       <Avatar side={side} size={130} />
