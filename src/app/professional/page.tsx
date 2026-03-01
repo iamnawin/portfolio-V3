@@ -165,7 +165,7 @@ const QUICK_RESPONSES: Record<string, { label: string; icon: string; answer: str
     label: "Experience",
     icon: "◈",
     href: "#experience",
-    answer: "Worked across fintech, logistics, and SaaS companies as an Application Designer & Salesforce Architect. Led teams building automation pipelines, custom CRM platforms, and AI-augmented workflows at scale.",
+    answer: "Worked across fintech, logistics, and SaaS companies as a Solutions Architect & Business Analyst. Led teams designing AI-powered solutions, custom CRM platforms, and enterprise delivery at scale.",
   },
   skills: {
     label: "Skills",
@@ -247,7 +247,7 @@ function Hero() {
           NAVEEN
         </h1>
         <div className="mt-4" style={{ fontFamily: "var(--font-body)", fontSize: 17, color: "#60a5fa", minHeight: 26 }}>
-          <TypedText texts={["Intelligent Systems Designer", "AI Application Architect", "Enterprise Solutions Engineer", "Salesforce Platform Expert"]} />
+          <TypedText texts={["AI Solutions Architect", "Business Analyst & FDE", "Enterprise Solutions Designer", "Salesforce Platform Expert"]} />
         </div>
       </div>
 
@@ -648,7 +648,7 @@ function Contact() {
             <span style={{ color: "#3b82f6" }}>SOMETHING SOLID</span>
           </h2>
           <p className="mb-10 max-w-lg mx-auto" style={{ fontFamily: "var(--font-body)", fontSize: 16, lineHeight: 1.8, color: "rgba(148,163,184,0.6)" }}>
-            Looking for an Application Designer who thinks in systems, not just screens? Let&apos;s talk.
+            Looking for an AI Solutions Architect who bridges business and technology? Let&apos;s talk.
           </p>
           <a
             href="mailto:t_naveen@outlook.in"
