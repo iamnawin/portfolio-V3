@@ -359,7 +359,7 @@ function ToggleSwitch({
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        columnGap: 4,
+        minWidth: 180,
         background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 100%)",
         borderRadius: 50,
         marginBottom: 6,
@@ -414,7 +414,7 @@ function ToggleSwitch({
         )}
         <span style={{
           position: "relative", zIndex: 1,
-          fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.22em",
+          fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.14em",
           color: pillOnCreative ? "#fff" : "rgba(148,163,184,0.35)",
           fontWeight: pillOnCreative ? 600 : 400,
           textShadow: pillOnCreative ? "0 1px 2px rgba(0,0,0,0.6)" : "none",
