@@ -37,7 +37,7 @@ const SIDES = {
     label: "CREATIVE",
     name: "NAVEEN",
     title: "AI Cinematic Enthusiast",
-    subtitle: "Storyteller · Content Maker · Founder @AIWITHNOBRAIN",
+    subtitle: "Storyteller · Founder @AIWITHNOBRAIN · @ZeroOrigins",
     tags: ["AI Content", "AI Music", "AI Ads"],
     desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
     enter: "/creator",
