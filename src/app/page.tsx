@@ -335,10 +335,10 @@ function ToggleSwitch({
 }) {
   const dragStartX = useRef<number | null>(null);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handlePointerDown = (e: { clientX: number }) => {
     dragStartX.current = e.clientX;
   };
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = (e: { clientX: number }) => {
     if (dragStartX.current === null) return;
     const delta = e.clientX - dragStartX.current;
     dragStartX.current = null;
@@ -366,6 +366,7 @@ function ToggleSwitch({
         cursor: "pointer",
         userSelect: "none" as const,
         boxShadow: "inset 0 2px 8px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.06)",
+        overflow: "hidden",
         touchAction: "none",
       }}
     >
