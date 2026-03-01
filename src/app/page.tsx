@@ -20,7 +20,7 @@ const SIDES = {
     accent: "#3b82f6",
     accentSoft: "rgba(59,130,246,",
     bg: "#060d1a",
-    cardBg: "rgba(11,17,32,0.95)",
+    cardBg: "rgba(11,17,32,0.72)",
     avatarBg: "linear-gradient(135deg, #1e3a5f 0%, #0b1120 100%)",
     avatarAccent: "#3b82f6",
     photo: "/naveen-pro.jpg?v=2",
@@ -48,7 +48,7 @@ const SIDES = {
     accent: "#f59e0b",
     accentSoft: "rgba(245,158,11,",
     bg: "#110900",
-    cardBg: "rgba(20,12,0,0.95)",
+    cardBg: "rgba(20,12,0,0.72)",
     avatarBg: "linear-gradient(135deg, #3d1f00 0%, #110900 100%)",
     avatarAccent: "#f59e0b",
     photo: "/naveen-creative.jpg",
@@ -448,27 +448,42 @@ function CardFace({
         position: hidden ? "absolute" : "relative",
         top: 0, left: 0, width: "100%",
         background: side.cardBg,
-        border: `1px solid ${side.accentSoft}0.12)`,
+        backdropFilter: "blur(24px) saturate(160%)",
+        WebkitBackdropFilter: "blur(24px) saturate(160%)",
+        border: `1px solid rgba(255,255,255,0.08)`,
         borderRadius: 24,
         padding: "28px 32px 28px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         gap: 0,
-        boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px ${side.accentSoft}0.12)`,
+        boxShadow: `0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px ${side.accentSoft}0.1), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.25)`,
         animation: "border-glow 4s ease-in-out infinite",
       }}
     >
-      {/* Shimmer sweep overlay */}
+      {/* Glass overlay — sheen + shimmer sweep */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
         borderRadius: 24, overflow: "hidden", pointerEvents: "none", zIndex: 0,
       }}>
+        {/* Static top-edge glass highlight */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 90,
+          background: "linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 100%)",
+          borderRadius: "24px 24px 0 0",
+        }} />
+        {/* Bottom edge darkening for depth */}
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 60,
+          background: "linear-gradient(0deg, rgba(0,0,0,0.18) 0%, transparent 100%)",
+          borderRadius: "0 0 24px 24px",
+        }} />
+        {/* Diagonal shimmer sweep */}
         <div style={{
           position: "absolute",
           top: "-80%", left: "-60%",
           width: "40%", height: "260%",
-          background: `linear-gradient(105deg, transparent 30%, ${side.accentSoft}0.07) 50%, transparent 70%)`,
+          background: `linear-gradient(105deg, transparent 30%, ${side.accentSoft}0.1) 50%, transparent 70%)`,
           transform: "rotate(15deg)",
           animation: "shimmer-sweep 6s ease-in-out infinite",
         }} />
