@@ -1,6 +1,6 @@
 # Naveen's Portfolio V3
 
-A dual-identity portfolio built with a flip-card concept — one person, two professional faces: **PRO** (AI-Driven Application Designer) and **CREATIVE** (AI Cinematic Creator).
+A dual-identity portfolio built with a flip-card concept — one person, two professional faces: **PROFESSIONAL** (AI-Driven Application Designer) and **CREATIVE** (AI Cinematic Creator).
 
 ---
 
