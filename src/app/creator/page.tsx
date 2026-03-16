@@ -1457,9 +1457,10 @@ function Connect() {
             color: "rgba(254,243,199,0.45)",
           }}
         >
-          This is the ZeroOrigins universe — mythology, AI SaaS tools,
-          cinematic storytelling, music made from scratch. No investors.
-          No timeline. Just obsessive building on every free weekend.
+          This is <strong style={{ color: "#f59e0b", fontWeight: 600 }}>AIwithNoBrain</strong> —
+          mythology, AI cinema, music, and SaaS tools. All under{" "}
+          <strong style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</strong>.
+          No investors. No timeline. Just obsessive weekend building.
         </p>
 
         <p
