@@ -144,21 +144,37 @@ function playFlipSound() {
   } catch { /* silent fail */ }
 }
 
-const preloadedAudio: Record<string, HTMLAudioElement> = {};
-function getAudio(src: string): HTMLAudioElement {
-  if (!preloadedAudio[src]) {
-    const a = new Audio(src);
-    a.volume = 0.7;
-    a.load();
-    preloadedAudio[src] = a;
+// Web Audio API — zero-latency pre-decoded buffers
+let _audioCtx: AudioContext | null = null;
+const _audioBuffers: Record<string, AudioBuffer> = {};
+
+function getAudioCtx(): AudioContext {
+  if (!_audioCtx) {
+    _audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   }
-  return preloadedAudio[src];
+  return _audioCtx;
 }
+
+async function preloadBuffer(src: string) {
+  try {
+    const ctx = getAudioCtx();
+    if (_audioBuffers[src]) return;
+    const res = await fetch(src);
+    const ab = await res.arrayBuffer();
+    _audioBuffers[src] = await ctx.decodeAudioData(ab);
+  } catch { /* silent fail */ }
+}
+
 function playEnterSound(src: string) {
   try {
-    const audio = getAudio(src);
-    audio.currentTime = 0;
-    audio.play().catch(() => {});
+    const ctx = getAudioCtx();
+    if (ctx.state === "suspended") ctx.resume();
+    const buf = _audioBuffers[src];
+    if (!buf) return;
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    s.connect(ctx.destination);
+    s.start(0);
   } catch { /* silent fail */ }
 }
 
@@ -172,6 +188,9 @@ export default function HomeV2() {
 
   useEffect(() => {
     setBgReady(true);
+    // Preload audio buffers so playEnterSound fires with zero latency
+    preloadBuffer("/click-pro.mp3");
+    preloadBuffer("/click-creative.mp3");
   }, []);
 
   const handleFlip = () => {
