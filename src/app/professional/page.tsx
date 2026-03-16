@@ -568,9 +568,9 @@ function PersonalAIProjects() {
       desc: "Deconstructs story structures and generates plot blueprints using language models. Drop a premise, get a full narrative skeleton.",
       tags: ["LLM", "Storytelling", "Next.js", "AI"],
       color: "#a855f7",
-      glow: "rgba(168,85,247,0.15)",
+      glow: "rgba(168,85,247,0.18)",
       icon: "◈",
-      href: "https://github.com/iamnawin/PLOTDNA-AI",
+      href: "https://plotdna-ai.vercel.app",
     },
     {
       name: "APPLYO",
@@ -578,9 +578,9 @@ function PersonalAIProjects() {
       desc: "Upload one resume, approve a curated job list, Applyo auto-applies across Naukri, LinkedIn, and Indeed on your behalf. AI match scoring included.",
       tags: ["Next.js", "Supabase", "Playwright", "n8n", "AI"],
       color: "#3b82f6",
-      glow: "rgba(59,130,246,0.15)",
+      glow: "rgba(59,130,246,0.18)",
       icon: "◉",
-      href: "https://github.com/iamnawin/applyo-platform",
+      href: "https://applyo-platform.vercel.app",
     },
     {
       name: "ORGBLUEPRINT",
@@ -588,9 +588,9 @@ function PersonalAIProjects() {
       desc: "Turn business goals into org structures. Generates department hierarchies, role definitions, and headcount plans from a single prompt.",
       tags: ["AI", "React", "Org Design", "LLM"],
       color: "#06b6d4",
-      glow: "rgba(6,182,212,0.15)",
+      glow: "rgba(6,182,212,0.18)",
       icon: "◆",
-      href: "https://github.com/iamnawin/orgblueprint-app",
+      href: "https://orgblueprint-app-web.vercel.app",
     },
     {
       name: "STRUCTRA AI",
@@ -598,184 +598,254 @@ function PersonalAIProjects() {
       desc: "AI-powered system design studio. Generates entity diagrams, API schemas, and full tech stack recommendations from a product brief.",
       tags: ["Architecture", "AI", "System Design", "Next.js"],
       color: "#f59e0b",
-      glow: "rgba(245,158,11,0.15)",
+      glow: "rgba(245,158,11,0.18)",
       icon: "◇",
       href: "https://github.com/iamnawin/Structra-AI-Architect-Studio",
     },
   ];
 
-  const trackRef = useRef<HTMLDivElement>(null);
+  const n = projects.length;
   const [activeIdx, setActiveIdx] = useState(0);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
+  const [flying, setFlying] = useState(false);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
-    scrollLeft.current = trackRef.current?.scrollLeft ?? 0;
-    if (trackRef.current) trackRef.current.style.cursor = "grabbing";
-  };
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging.current || !trackRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - trackRef.current.offsetLeft;
-    trackRef.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.2;
-  };
-  const onMouseUp = () => {
-    isDragging.current = false;
-    if (trackRef.current) trackRef.current.style.cursor = "grab";
+  const next = () => {
+    if (flying) return;
+    setFlying(true);
+    setTimeout(() => {
+      setActiveIdx(i => (i + 1) % n);
+      setFlying(false);
+    }, 380);
   };
 
-  const scrollTo = (idx: number) => {
-    setActiveIdx(idx);
-    if (!trackRef.current) return;
-    const cards = trackRef.current.querySelectorAll<HTMLDivElement>(".ai-card");
-    cards[idx]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  const prev = () => {
+    if (flying) return;
+    setActiveIdx(i => (i - 1 + n) % n);
   };
+
+  // pos: 0=front, 1=second, 2=third, 3=back
+  const getPos = (idx: number) => (idx - activeIdx + n) % n;
+
+  const stackTransform = [
+    "translateY(0px) scale(1)",
+    "translateY(18px) scale(0.96)",
+    "translateY(32px) scale(0.92)",
+    "translateY(42px) scale(0.88)",
+  ];
+  const stackOpacity = [1, 0.55, 0.3, 0.12];
+  const stackZ = [40, 30, 20, 10];
+
+  const p = projects[activeIdx];
 
   return (
-    <section id="ai-projects" className="py-32 relative overflow-hidden" style={{ background: "#0a0f1e" }}>
-      {/* Ambient */}
+    <section id="ai-projects" className="py-28 md:py-32 relative overflow-hidden" style={{ background: "#0a0f1e" }}>
+      {/* Ambient glow behind deck */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(99,102,241,0.04) 0%, transparent 70%)",
+        background: `radial-gradient(ellipse 55% 45% at 50% 60%, ${p.glow} 0%, transparent 70%)`,
+        transition: "background 0.6s ease",
       }} />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-20">
+      <div className="max-w-5xl mx-auto px-6 md:px-20">
+        {/* Header */}
         <FadeIn>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "#a855f7", marginBottom: 12 }}>PERSONAL AI BUILDS</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "#a855f7", marginBottom: 12 }}>
+            PERSONAL AI PROJECTS
+          </div>
           <h2 className="mb-3" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#f1f5f9", lineHeight: 1.1 }}>
-            Apps I Ship at Night
+            100 Ideas. 4 Made It.
           </h2>
-          <p className="mb-10" style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "rgba(148,163,184,0.45)", maxWidth: 480 }}>
-            I generate 100 ideas. I kill 96. These 4 survived — built, shipped, and still running.
+          <p className="mb-14" style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "rgba(148,163,184,0.45)", maxWidth: 420 }}>
+            Personal AI tools — filtered ruthlessly, built from scratch, shipped.
           </p>
         </FadeIn>
-      </div>
 
-      {/* Sliding track */}
-      <div
-        ref={trackRef}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
-        className="flex gap-5 overflow-x-auto pb-4 select-none"
-        style={{
-          cursor: "grab",
-          scrollSnapType: "x mandatory",
-          scrollbarWidth: "none",
-          paddingLeft: "max(24px, calc((100vw - 1152px)/2 + 80px))",
-          paddingRight: "max(24px, calc((100vw - 1152px)/2 + 80px))",
-          WebkitOverflowScrolling: "touch",
-        }}
-      >
-        {projects.map((p, i) => (
-          <div
-            key={p.name}
-            className="ai-card shrink-0 flex flex-col"
-            onClick={() => scrollTo(i)}
-            style={{
-              width: "clamp(280px, 40vw, 360px)",
-              scrollSnapAlign: "center",
-            }}
-          >
-            <div
-              className="flex flex-col h-full rounded-2xl p-8 transition-all duration-500"
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: `1px solid ${p.color}22`,
-                boxShadow: `0 0 0 1px ${p.color}08, inset 0 1px 0 rgba(255,255,255,0.06), 0 20px 60px ${p.glow}`,
-                minHeight: 300,
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-6px)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${p.color}30, inset 0 1px 0 rgba(255,255,255,0.08), 0 30px 80px ${p.glow}`;
-                (e.currentTarget as HTMLDivElement).style.borderColor = `${p.color}44`;
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLDivElement).style.transform = "none";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${p.color}08, inset 0 1px 0 rgba(255,255,255,0.06), 0 20px 60px ${p.glow}`;
-                (e.currentTarget as HTMLDivElement).style.borderColor = `${p.color}22`;
-              }}
-            >
-              {/* Top row */}
-              <div className="flex items-start justify-between mb-6">
+        {/* Deck + info layout */}
+        <div className="flex flex-col md:flex-row items-start gap-12 md:gap-16">
+
+          {/* ── Stacked card deck ── */}
+          <div className="relative shrink-0 w-full md:w-[340px]" style={{ height: 390 }}>
+            {projects.map((card, i) => {
+              const pos = getPos(i);
+              const isFront = pos === 0;
+              return (
                 <div
-                  className="flex items-center justify-center w-12 h-12 rounded-xl"
-                  style={{ background: `${p.color}12`, border: `1px solid ${p.color}25` }}
+                  key={card.name}
+                  onClick={isFront ? () => window.open(card.href, "_blank") : undefined}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: 20,
+                    padding: "28px 28px 24px",
+                    background: "rgba(255,255,255,0.025)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: `1px solid ${card.color}${isFront ? "40" : "18"}`,
+                    boxShadow: isFront
+                      ? `0 0 0 1px ${card.color}15, inset 0 1px 0 rgba(255,255,255,0.07), 0 24px 64px ${card.glow}`
+                      : `0 4px 20px rgba(0,0,0,0.3)`,
+                    transform: flying && isFront
+                      ? "translateX(-120%) rotate(-12deg) scale(0.85)"
+                      : stackTransform[pos] ?? stackTransform[3],
+                    opacity: flying && isFront ? 0 : (stackOpacity[pos] ?? 0.1),
+                    zIndex: stackZ[pos] ?? 5,
+                    transition: flying && isFront
+                      ? "transform 0.38s cubic-bezier(0.4,0,1,1), opacity 0.38s ease"
+                      : "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.45s ease, border-color 0.4s ease, box-shadow 0.4s ease",
+                    cursor: isFront ? "pointer" : "default",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                 >
-                  <span style={{ fontSize: 20, color: p.color }}>{p.icon}</span>
+                  {/* Card icon + live badge */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      background: `${card.color}15`, border: `1px solid ${card.color}30`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 18, color: card.color,
+                    }}>
+                      {card.icon}
+                    </div>
+                    {isFront && (
+                      <span style={{
+                        fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.2em",
+                        color: card.color, background: `${card.color}12`,
+                        border: `1px solid ${card.color}25`, borderRadius: 50,
+                        padding: "3px 10px",
+                      }}>
+                        LIVE ↗
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Tagline + Name */}
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.18em", color: card.color, opacity: 0.7, marginBottom: 6 }}>
+                    {card.tagline.toUpperCase()}
+                  </div>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "#f1f5f9", lineHeight: 1.1, letterSpacing: "0.02em", marginBottom: 12 }}>
+                    {card.name}
+                  </h3>
+
+                  {/* Description — only on front */}
+                  <p style={{
+                    fontFamily: "var(--font-body)", fontSize: 13, lineHeight: 1.75,
+                    color: "rgba(148,163,184,0.6)", flex: 1,
+                    opacity: isFront ? 1 : 0, transition: "opacity 0.3s ease",
+                  }}>
+                    {card.desc}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="flex gap-2 flex-wrap mt-4" style={{ opacity: isFront ? 1 : 0, transition: "opacity 0.3s ease" }}>
+                    {card.tags.map(t => (
+                      <span key={t} style={{
+                        fontFamily: "var(--font-mono)", fontSize: 8, letterSpacing: "0.06em",
+                        padding: "3px 9px", borderRadius: 50,
+                        border: `1px solid ${card.color}25`, color: `${card.color}80`,
+                      }}>
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* ── Right side: info + controls ── */}
+          <div className="flex flex-col justify-between flex-1 md:pt-2" style={{ minHeight: 300 }}>
+            {/* Counter */}
+            <div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.2em", color: "rgba(148,163,184,0.3)", marginBottom: 6 }}>
+                {String(activeIdx + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
+              </div>
+              {/* Active project detail */}
+              <div key={activeIdx} style={{ animation: "fadeSlideUp 0.4s ease forwards" }}>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.18em", color: p.color, marginBottom: 10, opacity: 0.8 }}>
+                  {p.tagline.toUpperCase()}
+                </div>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", color: "#f1f5f9", lineHeight: 1.1, marginBottom: 14 }}>
+                  {p.name}
+                </h3>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 14, lineHeight: 1.8, color: "rgba(148,163,184,0.55)", marginBottom: 20, maxWidth: 360 }}>
+                  {p.desc}
+                </p>
+                {/* Open link */}
                 <a
                   href={p.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={e => e.stopPropagation()}
-                  className="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100"
-                  style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.18em", color: p.color, opacity: 0.55, textDecoration: "none" }}
+                  className="inline-flex items-center gap-2 transition-all duration-200 hover:-translate-y-0.5"
+                  style={{
+                    fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.18em",
+                    color: p.color, textDecoration: "none",
+                    padding: "9px 20px", borderRadius: 50,
+                    border: `1px solid ${p.color}35`, background: `${p.color}08`,
+                  }}
                 >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-                  </svg>
-                  VIEW →
+                  OPEN PROJECT ↗
                 </a>
               </div>
+            </div>
 
-              {/* Name + tagline */}
-              <div className="mb-2" style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.2em", color: p.color, opacity: 0.7 }}>
-                {p.tagline.toUpperCase()}
-              </div>
-              <h3 className="mb-4" style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "#f1f5f9", lineHeight: 1.1, letterSpacing: "0.02em" }}>
-                {p.name}
-              </h3>
-
-              {/* Desc */}
-              <p className="mb-6 flex-1" style={{ fontFamily: "var(--font-body)", fontSize: 13.5, lineHeight: 1.75, color: "rgba(148,163,184,0.6)" }}>
-                {p.desc}
-              </p>
-
-              {/* Tags */}
-              <div className="flex gap-2 flex-wrap">
-                {p.tags.map(t => (
-                  <span key={t} style={{
-                    fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.08em",
-                    padding: "3px 10px", borderRadius: 50,
-                    border: `1px solid ${p.color}25`, color: `${p.color}88`,
-                  }}>
-                    {t}
-                  </span>
+            {/* Navigation arrows + dots */}
+            <div className="flex items-center gap-4 mt-10">
+              <button
+                onClick={prev}
+                style={{
+                  width: 40, height: 40, borderRadius: "50%",
+                  border: "1px solid rgba(148,163,184,0.15)", background: "rgba(255,255,255,0.03)",
+                  color: "rgba(148,163,184,0.5)", cursor: "pointer", fontSize: 16,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = p.color; (e.currentTarget as HTMLButtonElement).style.color = p.color; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(148,163,184,0.15)"; (e.currentTarget as HTMLButtonElement).style.color = "rgba(148,163,184,0.5)"; }}
+              >
+                ←
+              </button>
+              <div className="flex gap-2">
+                {projects.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { if (!flying) setActiveIdx(i); }}
+                    style={{
+                      width: activeIdx === i ? 20 : 5,
+                      height: 5, borderRadius: 3,
+                      background: activeIdx === i ? p.color : "rgba(148,163,184,0.2)",
+                      border: "none", cursor: "pointer",
+                      transition: "all 0.3s ease", padding: 0,
+                    }}
+                  />
                 ))}
               </div>
+              <button
+                onClick={next}
+                style={{
+                  width: 40, height: 40, borderRadius: "50%",
+                  border: `1px solid ${p.color}50`, background: `${p.color}10`,
+                  color: p.color, cursor: "pointer", fontSize: 16,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = `${p.color}20`; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = `${p.color}10`; }}
+              >
+                →
+              </button>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.15em", color: "rgba(148,163,184,0.25)", marginLeft: 4 }}>
+                CLICK CARD TO OPEN
+              </span>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-2 mt-8">
-        {projects.map((p, i) => (
-          <button
-            key={i}
-            onClick={() => scrollTo(i)}
-            style={{
-              width: activeIdx === i ? 24 : 6,
-              height: 6,
-              borderRadius: 3,
-              background: activeIdx === i ? p.color : "rgba(148,163,184,0.2)",
-              border: "none",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              padding: 0,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Hide scrollbar */}
-      <style>{`.ai-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); } [style*="scrollbarWidth"] { scrollbar-width: none; } [style*="scrollbarWidth"]::-webkit-scrollbar { display: none; }`}</style>
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 }
