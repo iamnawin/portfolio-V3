@@ -1210,8 +1210,8 @@ function Story() {
             {[
               { num: "WKD", label: "Built on Weekends", color: "#f59e0b" },
               { num: "∅→", label: "Started With No Goal", color: "#ef4444" },
-              { num: "2AM", label: "When Ideas Hit", color: "#8b5cf6" },
-              { num: "∞", label: "Under ZeroOrigins", color: "#f59e0b" },
+              { num: "SFX", label: "AI Audio & Music", color: "#06b6d4" },
+              { num: "VFX", label: "AI Video & Cinema", color: "#8b5cf6" },
             ].map((s) => (
               <div
                 key={s.label}
