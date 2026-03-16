@@ -16,6 +16,7 @@ const SIDES = {
     desc: "I turn business problems into scalable solutions — AI, Salesforce, and enterprise delivery.",
     enter: "/professional",
     enterLabel: "VIEW PROFESSIONAL PROFILE",
+    clickSound: "/click-pro.mp3",
     flipLabel: "SEE CREATIVE SIDE",
     accent: "#3b82f6",
     accentSoft: "rgba(59,130,246,",
@@ -44,6 +45,7 @@ const SIDES = {
     desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
     enter: "/creator",
     enterLabel: "VIEW CREATIVE PROFILE",
+    clickSound: "/click-creative.mp3",
     flipLabel: "SEE PROFESSIONAL SIDE",
     accent: "#f59e0b",
     accentSoft: "rgba(245,158,11,",
@@ -139,6 +141,14 @@ function playFlipSound() {
     const audio = new Audio("/comedy_pop_finger_in_mouth_001.mp3");
     audio.volume = 0.6;
     audio.play().catch(() => { /* silent fail if blocked */ });
+  } catch { /* silent fail */ }
+}
+
+function playEnterSound(src: string) {
+  try {
+    const audio = new Audio(src);
+    audio.volume = 0.7;
+    audio.play().catch(() => {});
   } catch { /* silent fail */ }
 }
 
@@ -597,6 +607,7 @@ function CardFace({
       {/* ENTER button */}
       <Link
         href={side.enter}
+        onClick={() => playEnterSound(side.clickSound)}
         style={{
           display: "block",
           width: "100%",
