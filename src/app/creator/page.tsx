@@ -1197,12 +1197,12 @@ function Story() {
                 color: "rgba(254,243,199,0.5)",
               }}
             >
-              Today,{" "}
               <span style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</span>{" "}
-              is the engine behind it all — AI SaaS products,{" "}
-              <span style={{ color: "#f59e0b" }}>AIwithNoBrain</span> on YouTube,
-              cinematic epics, and music. Still built on weekends.
-              Still driven by one question: what&apos;s actually possible?
+              is everything I couldn&apos;t stop building — AI tools that actually ship,
+              Hindu epics brought to screen,{" "}
+              <span style={{ color: "#f59e0b" }}>AIwithNoBrain</span> for anyone
+              curious enough to watch. No playbook. No roadmap. Just whatever gets
+              made between Friday night and Sunday.
             </p>
           </div>
 
