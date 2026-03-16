@@ -712,7 +712,7 @@ function CinematicTicker() {
     "◆ AI · SAAS · BUILDER COMMUNITY",
     "● STOP THINKING · START CREATING",
     "▶ AI MUSIC · SONIC MYTHOLOGY",
-    "◆ 27 EPISODES · VERTICAL CINEMA",
+    "◆ 27 EPISODES · AI RAMAYANAM",
     "● FROM THOUGHT TO THUNDER",
     "▶ ZERO ORIGINS · BUILD WITH AI",
   ];
@@ -1160,7 +1160,7 @@ function Story() {
             marginBottom: 40,
           }}
         >
-          Where Ancient Epics
+          Started With Nothing.
           <br />
           <span
             style={{
@@ -1169,7 +1169,7 @@ function Story() {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Meet AI Cinema
+            Built Everything.
           </span>
         </h2>
 
@@ -1184,12 +1184,10 @@ function Story() {
                 marginBottom: 20,
               }}
             >
-              Through{" "}
-              <span style={{ color: "#f59e0b" }}>AIwithNoBrain</span> and{" "}
-              <span style={{ color: "#ef4444" }}>ZeroOrigins</span>, I&apos;m
-              producing &quot;AI Ramayanam: War of Dharma&quot; — a 27-episode
-              cinematic series that brings Hindu mythology to life using
-              AI-generated visuals with Spielbergian production values.
+              It didn&apos;t start with a plan. Just a guy, a weekend, and a
+              raw curiosity about what AI could actually create. No pitch deck.
+              No roadmap. Then one late night, a scene from the Ramayanam
+              rendered itself on screen — and everything shifted.
             </p>
             <p
               style={{
@@ -1199,19 +1197,21 @@ function Story() {
                 color: "rgba(254,243,199,0.5)",
               }}
             >
-              Every frame is crafted with obsessive attention to cultural
-              authenticity — from Sanskrit terminology to mythological
-              accuracy — while pushing the boundaries of what AI can create
-              in cinematic storytelling.
+              Today,{" "}
+              <span style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</span>{" "}
+              is the engine behind it all — AI SaaS products,{" "}
+              <span style={{ color: "#f59e0b" }}>AIwithNoBrain</span> on YouTube,
+              cinematic mythology, and music. Still built on weekends.
+              Still driven by one question: what&apos;s actually possible?
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-5">
             {[
-              { num: "27", label: "Episodes", color: "#f59e0b" },
-              { num: "AI", label: "Mythic Worlds", color: "#ef4444" },
-              { num: "AI", label: "Generated Visuals", color: "#8b5cf6" },
-              { num: "∞", label: "Stories Untold", color: "#f59e0b" },
+              { num: "WKD", label: "Built on Weekends", color: "#f59e0b" },
+              { num: "∅→", label: "Started With No Goal", color: "#ef4444" },
+              { num: "2AM", label: "When Ideas Hit", color: "#8b5cf6" },
+              { num: "∞", label: "Under ZeroOrigins", color: "#f59e0b" },
             ].map((s) => (
               <div
                 key={s.label}
@@ -1457,9 +1457,9 @@ function Connect() {
             color: "rgba(254,243,199,0.45)",
           }}
         >
-          This is my creative universe — mythology, AI filmmaking, music, and
-          building in public. Not a side hustle, not a business pitch.
-          Just what I love doing outside of work.
+          This is the ZeroOrigins universe — mythology, AI SaaS tools,
+          cinematic storytelling, music made from scratch. No investors.
+          No timeline. Just obsessive building on every free weekend.
         </p>
 
         <p

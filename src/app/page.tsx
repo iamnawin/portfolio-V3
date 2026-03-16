@@ -45,7 +45,7 @@ const SIDES = {
     desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
     enter: "/creator",
     enterLabel: "VIEW CREATIVE PROFILE",
-    clickSound: "/click-creative.mp3",
+    clickSound: "/click-creative.mp3?v=2",
     flipLabel: "SEE PROFESSIONAL SIDE",
     accent: "#f59e0b",
     accentSoft: "rgba(245,158,11,",
@@ -190,7 +190,7 @@ export default function HomeV2() {
     setBgReady(true);
     // Preload audio buffers so playEnterSound fires with zero latency
     preloadBuffer("/click-pro.mp3");
-    preloadBuffer("/click-creative.mp3");
+    preloadBuffer("/click-creative.mp3?v=2");
   }, []);
 
   const handleFlip = () => {
