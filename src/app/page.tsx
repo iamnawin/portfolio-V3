@@ -607,7 +607,8 @@ function CardFace({
       {/* ENTER button */}
       <Link
         href={side.enter}
-        onClick={() => playEnterSound(side.clickSound)}
+        onMouseDown={() => playEnterSound(side.clickSound)}
+        onTouchStart={() => playEnterSound(side.clickSound)}
         style={{
           display: "block",
           width: "100%",
