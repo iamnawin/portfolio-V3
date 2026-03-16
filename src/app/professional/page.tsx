@@ -647,8 +647,8 @@ function PersonalAIProjects() {
           <h2 className="mb-3" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#f1f5f9", lineHeight: 1.1 }}>
             Apps I Ship at Night
           </h2>
-          <p className="mb-10" style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "rgba(148,163,184,0.45)", maxWidth: 400 }}>
-            Side projects. Real code. AI-first tools built for actual problems.
+          <p className="mb-10" style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "rgba(148,163,184,0.45)", maxWidth: 480 }}>
+            I generate 100 ideas. I kill 96. These 4 survived — built, shipped, and still running.
           </p>
         </FadeIn>
       </div>
