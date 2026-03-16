@@ -1499,6 +1499,29 @@ function Connect() {
           </a>
 
           <a
+            href="https://music.youtube.com/channel/UCEtEPGlyMff6rhroYZpU-Vg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-10 py-4 rounded-full transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              letterSpacing: "0.15em",
+              background: "linear-gradient(135deg, #1a1a2e, #16213e)",
+              color: "#fff",
+              fontWeight: 600,
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 0 30px rgba(139,92,246,0.15)",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/>
+            </svg>
+            LISTEN TO MY MUSIC
+          </a>
+
+          <a
             href={`mailto:${email}`}
             style={{
               fontFamily: "var(--font-mono)",
