@@ -144,10 +144,20 @@ function playFlipSound() {
   } catch { /* silent fail */ }
 }
 
+const preloadedAudio: Record<string, HTMLAudioElement> = {};
+function getAudio(src: string): HTMLAudioElement {
+  if (!preloadedAudio[src]) {
+    const a = new Audio(src);
+    a.volume = 0.7;
+    a.load();
+    preloadedAudio[src] = a;
+  }
+  return preloadedAudio[src];
+}
 function playEnterSound(src: string) {
   try {
-    const audio = new Audio(src);
-    audio.volume = 0.7;
+    const audio = getAudio(src);
+    audio.currentTime = 0;
     audio.play().catch(() => {});
   } catch { /* silent fail */ }
 }
