@@ -1198,8 +1198,9 @@ function Story() {
               }}
             >
               <span style={{ color: "#f59e0b", fontWeight: 500 }}>AIwithNoBrain</span>{" "}
-              is the creative side of all this — Hindu epics on screen, music
-              generated from nothing, stories that didn&apos;t exist until I made them.{" "}
+              is the creative side of all this — bringing Hindu epics and
+              ancient stories to life through AI, the way they were always
+              meant to be seen.{" "}
               <span style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</span>{" "}
               runs the AI apps. This is the other half. The part that started
               because the tools were too good not to make something real with them.
