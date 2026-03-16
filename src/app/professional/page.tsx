@@ -606,20 +606,44 @@ function PersonalAIProjects() {
 
   const n = projects.length;
   const [activeIdx, setActiveIdx] = useState(0);
-  const [flying, setFlying] = useState(false);
+  const [flying, setFlying] = useState<"left" | "right" | null>(null);
+  const touchStartX = useRef(0);
+  const touchDeltaX = useRef(0);
 
   const next = () => {
     if (flying) return;
-    setFlying(true);
+    setFlying("left");
     setTimeout(() => {
       setActiveIdx(i => (i + 1) % n);
-      setFlying(false);
+      setFlying(null);
     }, 380);
   };
 
   const prev = () => {
     if (flying) return;
-    setActiveIdx(i => (i - 1 + n) % n);
+    setFlying("right");
+    setTimeout(() => {
+      setActiveIdx(i => (i - 1 + n) % n);
+      setFlying(null);
+    }, 380);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchDeltaX.current = 0;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
+  };
+
+  const onTouchEnd = () => {
+    const dx = touchDeltaX.current;
+    if (Math.abs(dx) > 48) {
+      if (dx < 0) next();
+      else prev();
+    }
+    touchDeltaX.current = 0;
   };
 
   // pos: 0=front, 1=second, 2=third, 3=back
@@ -662,10 +686,20 @@ function PersonalAIProjects() {
         <div className="flex flex-col md:flex-row items-start gap-12 md:gap-16">
 
           {/* ── Stacked card deck ── */}
-          <div className="relative shrink-0 w-full md:w-[340px]" style={{ height: 390 }}>
+          <div
+            className="relative shrink-0 w-full md:w-[340px]"
+            style={{ height: 390, touchAction: "pan-y" }}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             {projects.map((card, i) => {
               const pos = getPos(i);
               const isFront = pos === 0;
+              const flyingOut = flying && isFront;
+              const flyTransform = flying === "left"
+                ? "translateX(-120%) rotate(-12deg) scale(0.85)"
+                : "translateX(120%) rotate(12deg) scale(0.85)";
               return (
                 <div
                   key={card.name}
@@ -682,17 +716,18 @@ function PersonalAIProjects() {
                     boxShadow: isFront
                       ? `0 0 0 1px ${card.color}15, inset 0 1px 0 rgba(255,255,255,0.07), 0 24px 64px ${card.glow}`
                       : `0 4px 20px rgba(0,0,0,0.3)`,
-                    transform: flying && isFront
-                      ? "translateX(-120%) rotate(-12deg) scale(0.85)"
+                    transform: flyingOut
+                      ? flyTransform
                       : stackTransform[pos] ?? stackTransform[3],
-                    opacity: flying && isFront ? 0 : (stackOpacity[pos] ?? 0.1),
+                    opacity: flyingOut ? 0 : (stackOpacity[pos] ?? 0.1),
                     zIndex: stackZ[pos] ?? 5,
-                    transition: flying && isFront
+                    transition: flyingOut
                       ? "transform 0.38s cubic-bezier(0.4,0,1,1), opacity 0.38s ease"
                       : "transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.45s ease, border-color 0.4s ease, box-shadow 0.4s ease",
                     cursor: isFront ? "pointer" : "default",
                     display: "flex",
                     flexDirection: "column",
+                    userSelect: "none",
                   }}
                 >
                   {/* Card icon + live badge */}
