@@ -1209,7 +1209,7 @@ function Story() {
           <div className="grid grid-cols-2 gap-5">
             {[
               { num: "27", label: "Episodes", color: "#f59e0b" },
-              { num: "9:16", label: "Vertical Cinema", color: "#ef4444" },
+              { num: "AI", label: "Mythic Worlds", color: "#ef4444" },
               { num: "AI", label: "Generated Visuals", color: "#8b5cf6" },
               { num: "∞", label: "Stories Untold", color: "#f59e0b" },
             ].map((s) => (
