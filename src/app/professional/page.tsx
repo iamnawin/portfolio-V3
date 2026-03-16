@@ -114,7 +114,7 @@ function Navbar() {
 
       <div className="flex items-center gap-6">
         <div className="hidden md:flex gap-9">
-          {["about", "experience", "skills", "projects", "certifications", "contact"].map((s) => (
+          {["about", "experience", "skills", "projects", "ai-projects", "certifications", "contact"].map((s) => (
             <a
               key={s}
               href={`#${s}`}
@@ -559,6 +559,227 @@ function Projects() {
   );
 }
 
+// ── Personal AI Projects ────────────────────────────────────
+function PersonalAIProjects() {
+  const projects = [
+    {
+      name: "PLOTDNA AI",
+      tagline: "Narrative DNA Engine",
+      desc: "Deconstructs story structures and generates plot blueprints using language models. Drop a premise, get a full narrative skeleton.",
+      tags: ["LLM", "Storytelling", "Next.js", "AI"],
+      color: "#a855f7",
+      glow: "rgba(168,85,247,0.15)",
+      icon: "◈",
+      href: "https://github.com/iamnawin/PLOTDNA-AI",
+    },
+    {
+      name: "APPLYO",
+      tagline: "AI-Powered Apply Engine",
+      desc: "Upload one resume, approve a curated job list, Applyo auto-applies across Naukri, LinkedIn, and Indeed on your behalf. AI match scoring included.",
+      tags: ["Next.js", "Supabase", "Playwright", "n8n", "AI"],
+      color: "#3b82f6",
+      glow: "rgba(59,130,246,0.15)",
+      icon: "◉",
+      href: "https://github.com/iamnawin/applyo-platform",
+    },
+    {
+      name: "ORGBLUEPRINT",
+      tagline: "AI Org Designer",
+      desc: "Turn business goals into org structures. Generates department hierarchies, role definitions, and headcount plans from a single prompt.",
+      tags: ["AI", "React", "Org Design", "LLM"],
+      color: "#06b6d4",
+      glow: "rgba(6,182,212,0.15)",
+      icon: "◆",
+      href: "https://github.com/iamnawin/orgblueprint-app",
+    },
+    {
+      name: "STRUCTRA AI",
+      tagline: "Architect Studio",
+      desc: "AI-powered system design studio. Generates entity diagrams, API schemas, and full tech stack recommendations from a product brief.",
+      tags: ["Architecture", "AI", "System Design", "Next.js"],
+      color: "#f59e0b",
+      glow: "rgba(245,158,11,0.15)",
+      icon: "◇",
+      href: "https://github.com/iamnawin/Structra-AI-Architect-Studio",
+    },
+  ];
+
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
+    scrollLeft.current = trackRef.current?.scrollLeft ?? 0;
+    if (trackRef.current) trackRef.current.style.cursor = "grabbing";
+  };
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !trackRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - trackRef.current.offsetLeft;
+    trackRef.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.2;
+  };
+  const onMouseUp = () => {
+    isDragging.current = false;
+    if (trackRef.current) trackRef.current.style.cursor = "grab";
+  };
+
+  const scrollTo = (idx: number) => {
+    setActiveIdx(idx);
+    if (!trackRef.current) return;
+    const cards = trackRef.current.querySelectorAll<HTMLDivElement>(".ai-card");
+    cards[idx]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  };
+
+  return (
+    <section id="ai-projects" className="py-32 relative overflow-hidden" style={{ background: "#0a0f1e" }}>
+      {/* Ambient */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(99,102,241,0.04) 0%, transparent 70%)",
+      }} />
+
+      <div className="max-w-6xl mx-auto px-6 md:px-20">
+        <FadeIn>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "#a855f7", marginBottom: 12 }}>PERSONAL AI BUILDS</div>
+          <h2 className="mb-3" style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.5rem)", color: "#f1f5f9", lineHeight: 1.1 }}>
+            Apps I Ship at Night
+          </h2>
+          <p className="mb-10" style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "rgba(148,163,184,0.45)", maxWidth: 400 }}>
+            Side projects. Real code. AI-first tools built for actual problems.
+          </p>
+        </FadeIn>
+      </div>
+
+      {/* Sliding track */}
+      <div
+        ref={trackRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        className="flex gap-5 overflow-x-auto pb-4 select-none"
+        style={{
+          cursor: "grab",
+          scrollSnapType: "x mandatory",
+          scrollbarWidth: "none",
+          paddingLeft: "max(24px, calc((100vw - 1152px)/2 + 80px))",
+          paddingRight: "max(24px, calc((100vw - 1152px)/2 + 80px))",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {projects.map((p, i) => (
+          <div
+            key={p.name}
+            className="ai-card shrink-0 flex flex-col"
+            onClick={() => scrollTo(i)}
+            style={{
+              width: "clamp(280px, 40vw, 360px)",
+              scrollSnapAlign: "center",
+            }}
+          >
+            <div
+              className="flex flex-col h-full rounded-2xl p-8 transition-all duration-500"
+              style={{
+                background: "rgba(255,255,255,0.02)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: `1px solid ${p.color}22`,
+                boxShadow: `0 0 0 1px ${p.color}08, inset 0 1px 0 rgba(255,255,255,0.06), 0 20px 60px ${p.glow}`,
+                minHeight: 300,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-6px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${p.color}30, inset 0 1px 0 rgba(255,255,255,0.08), 0 30px 80px ${p.glow}`;
+                (e.currentTarget as HTMLDivElement).style.borderColor = `${p.color}44`;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "none";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 0 1px ${p.color}08, inset 0 1px 0 rgba(255,255,255,0.06), 0 20px 60px ${p.glow}`;
+                (e.currentTarget as HTMLDivElement).style.borderColor = `${p.color}22`;
+              }}
+            >
+              {/* Top row */}
+              <div className="flex items-start justify-between mb-6">
+                <div
+                  className="flex items-center justify-center w-12 h-12 rounded-xl"
+                  style={{ background: `${p.color}12`, border: `1px solid ${p.color}25` }}
+                >
+                  <span style={{ fontSize: 20, color: p.color }}>{p.icon}</span>
+                </div>
+                <a
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100"
+                  style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.18em", color: p.color, opacity: 0.55, textDecoration: "none" }}
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                  </svg>
+                  VIEW →
+                </a>
+              </div>
+
+              {/* Name + tagline */}
+              <div className="mb-2" style={{ fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.2em", color: p.color, opacity: 0.7 }}>
+                {p.tagline.toUpperCase()}
+              </div>
+              <h3 className="mb-4" style={{ fontFamily: "var(--font-display)", fontSize: 26, color: "#f1f5f9", lineHeight: 1.1, letterSpacing: "0.02em" }}>
+                {p.name}
+              </h3>
+
+              {/* Desc */}
+              <p className="mb-6 flex-1" style={{ fontFamily: "var(--font-body)", fontSize: 13.5, lineHeight: 1.75, color: "rgba(148,163,184,0.6)" }}>
+                {p.desc}
+              </p>
+
+              {/* Tags */}
+              <div className="flex gap-2 flex-wrap">
+                {p.tags.map(t => (
+                  <span key={t} style={{
+                    fontFamily: "var(--font-mono)", fontSize: 9, letterSpacing: "0.08em",
+                    padding: "3px 10px", borderRadius: 50,
+                    border: `1px solid ${p.color}25`, color: `${p.color}88`,
+                  }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-2 mt-8">
+        {projects.map((p, i) => (
+          <button
+            key={i}
+            onClick={() => scrollTo(i)}
+            style={{
+              width: activeIdx === i ? 24 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: activeIdx === i ? p.color : "rgba(148,163,184,0.2)",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              padding: 0,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Hide scrollbar */}
+      <style>{`.ai-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); } [style*="scrollbarWidth"] { scrollbar-width: none; } [style*="scrollbarWidth"]::-webkit-scrollbar { display: none; }`}</style>
+    </section>
+  );
+}
+
 // ── Certifications ─────────────────────────────────────────
 function Certifications() {
   const certs = [
@@ -718,6 +939,7 @@ export default function ProfessionalPage() {
       <Experience />
       <Skills />
       <Projects />
+      <PersonalAIProjects />
       <Certifications />
       <Contact />
     </main>
