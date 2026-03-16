@@ -42,7 +42,7 @@ const SIDES = {
     subtitle: "Storyteller · AI Learner · Founder",
     brands: "AIWITHNOBRAIN · ZeroOrigins",
     tags: ["AI Content", "AI Music", "AI Ads"],
-    desc: "I craft AI-powered stories and cinematic worlds — where mythology meets machine intelligence.",
+    desc: "I craft AI-powered cinematic epics — bringing ancient Hindu scriptures to life through machine intelligence.",
     enter: "/creator",
     enterLabel: "VIEW CREATIVE PROFILE",
     clickSound: "/click-creative.mp3?v=2",

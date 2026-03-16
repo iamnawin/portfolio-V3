@@ -711,7 +711,7 @@ function CinematicTicker() {
     "▶ ZEROORIGINS.IN",
     "◆ AI · SAAS · BUILDER COMMUNITY",
     "● STOP THINKING · START CREATING",
-    "▶ AI MUSIC · SONIC MYTHOLOGY",
+    "▶ AI MUSIC · SONIC DHARMA",
     "◆ 27 EPISODES · AI RAMAYANAM",
     "● FROM THOUGHT TO THUNDER",
     "▶ ZERO ORIGINS · BUILD WITH AI",
@@ -922,7 +922,7 @@ function Hero() {
           >
             <TypedText
               texts={[
-                "MYTHOLOGY STORYTELLER",
+                "EPIC DHARMIC STORYTELLER",
                 "CINEMATIC CREATOR",
                 "AI FILMMAKER",
                 "CONTENT ALCHEMIST",
@@ -1201,7 +1201,7 @@ function Story() {
               <span style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</span>{" "}
               is the engine behind it all — AI SaaS products,{" "}
               <span style={{ color: "#f59e0b" }}>AIwithNoBrain</span> on YouTube,
-              cinematic mythology, and music. Still built on weekends.
+              cinematic epics, and music. Still built on weekends.
               Still driven by one question: what&apos;s actually possible?
             </p>
           </div>
@@ -1257,7 +1257,7 @@ function Projects() {
     {
       title: "AI Ramayanam: War of Dharma",
       tag: "CINEMATIC SERIES",
-      desc: "27-episode AI-generated cinematic series bringing Hindu mythology to life. Photorealistic visuals, authentic cultural representation, shot-by-shot storyboards.",
+      desc: "27-episode AI-generated cinematic series bringing the Hindu epic Ramayanam to the screen. Photorealistic visuals, authentic cultural representation, shot-by-shot storyboards.",
       tech: ["WAN 2.2", "Midjourney", "AI Video", "Storyboarding"],
       gradient: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.1))",
       accent: "#f59e0b",
@@ -1271,7 +1271,7 @@ function Projects() {
       accent: "#8b5cf6",
     },
     {
-      title: "Epic AI: Mythology Storytelling Course",
+      title: "Epic AI: Dharmic Storytelling Course",
       tag: "EDUCATION",
       desc: "Teaching creators how to produce cinematic AI content — from prompt engineering to production workflows.",
       tech: ["Course", "AI Workflows", "Prompt Engineering", "Production"],
@@ -1458,7 +1458,7 @@ function Connect() {
           }}
         >
           This is <strong style={{ color: "#f59e0b", fontWeight: 600 }}>AIwithNoBrain</strong> —
-          mythology, AI cinema, music, and SaaS tools. All under{" "}
+          ancient epics, AI cinema, music, and SaaS tools. All under{" "}
           <strong style={{ color: "#8b5cf6", fontWeight: 500 }}>ZeroOrigins</strong>.
           No investors. No timeline. Just obsessive weekend building.
         </p>
@@ -1472,7 +1472,7 @@ function Connect() {
             color: "rgba(254,243,199,0.3)",
           }}
         >
-          If you&apos;re into AI, storytelling, or mythology — let&apos;s talk.
+          If you&apos;re into AI, ancient epics, or building from scratch — let&apos;s talk.
         </p>
 
         {/* CTA row — YouTube first, email second */}
