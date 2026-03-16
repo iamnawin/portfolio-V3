@@ -1053,7 +1053,7 @@ function Hero() {
         >
           <TypedText
             texts={[
-              "MYTHOLOGY STORYTELLER",
+              "EPIC DHARMIC STORYTELLER",
               "CINEMATIC CREATOR",
               "AI FILMMAKER",
               "CONTENT ALCHEMIST",
@@ -1257,7 +1257,7 @@ function Projects() {
     {
       title: "AI Ramayanam: War of Dharma",
       tag: "CINEMATIC SERIES",
-      desc: "27-episode AI-generated cinematic series bringing the Hindu epic Ramayanam to the screen. Photorealistic visuals, authentic cultural representation, shot-by-shot storyboards.",
+      desc: "27-episode AI-generated cinematic series — starting with Ramayanam, expanding across Hindu epics and Puranas. Photorealistic visuals, authentic cultural representation, shot-by-shot storyboards.",
       tech: ["WAN 2.2", "Midjourney", "AI Video", "Storyboarding"],
       gradient: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.1))",
       accent: "#f59e0b",
