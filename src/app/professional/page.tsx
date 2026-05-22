@@ -114,7 +114,7 @@ function Navbar() {
 
       <div className="flex items-center gap-6">
         <div className="hidden md:flex gap-9">
-          {["about", "experience", "skills", "projects", "ai-projects", "certifications", "contact"].map((s) => (
+          {["about", "choose", "experience", "skills", "projects", "ai-projects", "certifications", "contact"].map((s) => (
             <a
               key={s}
               href={`#${s}`}
@@ -400,6 +400,85 @@ function About() {
 }
 
 // ── Experience ─────────────────────────────────────────────
+function ProfilePaths() {
+  const paths = [
+    {
+      eyebrow: "HIRE / COLLABORATE",
+      title: "Professional Work",
+      desc: "Experience, Salesforce delivery, architecture work, certifications, and enterprise projects.",
+      href: "#experience",
+      color: "#3b82f6",
+      bg: "rgba(59,130,246,0.05)",
+    },
+    {
+      eyebrow: "BUILD / EXPLORE",
+      title: "AI Apps & Experiments",
+      desc: "Personal AI products, shipped tools, SaaS experiments, and the 100 ideas filter.",
+      href: "#ai-projects",
+      color: "#a855f7",
+      bg: "rgba(168,85,247,0.05)",
+    },
+  ];
+
+  return (
+    <section id="choose" className="py-24 px-6 md:px-20 relative" style={{ background: "#0b1120", borderTop: "1px solid rgba(59,130,246,0.06)", borderBottom: "1px solid rgba(59,130,246,0.06)" }}>
+      <div className="max-w-5xl mx-auto">
+        <FadeIn>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.3em", color: "#60a5fa", marginBottom: 18 }}>
+            CHOOSE WHAT YOU WANT TO SEE
+          </div>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 4vw, 3.4rem)", color: "#f1f5f9", lineHeight: 1.05, marginBottom: 18 }}>
+            One Profile.
+            <br />
+            Two Ways In.
+          </h2>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 15, lineHeight: 1.8, color: "rgba(148,163,184,0.6)", maxWidth: 620, marginBottom: 36 }}>
+            If you are reviewing me for a role, start with the professional track. If you want to see what I am building with AI, jump straight into the apps and experiments.
+          </p>
+        </FadeIn>
+
+        <div className="grid md:grid-cols-2 gap-5">
+          {paths.map((path, i) => (
+            <FadeIn key={path.title} delay={0.1 + i * 0.1} direction={i === 0 ? "left" : "right"}>
+              <a
+                href={path.href}
+                className="group block h-full rounded-xl p-7 transition-all duration-300 hover:-translate-y-1"
+                style={{ background: path.bg, border: `1px solid ${path.color}22`, textDecoration: "none" }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = `${path.color}66`;
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 18px 60px ${path.color}14`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.borderColor = `${path.color}22`;
+                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+                }}
+              >
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.18em", color: `${path.color}cc`, marginBottom: 16 }}>
+                  {path.eyebrow}
+                </div>
+                <div className="flex items-end justify-between gap-4">
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2.1rem, 5vw, 3rem)", color: "#f8fafc", lineHeight: 0.95 }}>
+                    {path.title}
+                  </h3>
+                  <span
+                    className="shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                    style={{ fontFamily: "var(--font-mono)", fontSize: 22, color: path.color }}
+                  >
+                    -&gt;
+                  </span>
+                </div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 14, lineHeight: 1.75, color: "rgba(148,163,184,0.62)", marginTop: 20, maxWidth: 420 }}>
+                  {path.desc}
+                </p>
+              </a>
+            </FadeIn>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Experience() {
   const jobs = [
     {
@@ -1041,6 +1120,7 @@ export default function ProfessionalPage() {
       <Navbar />
       <Hero />
       <About />
+      <ProfilePaths />
       <Experience />
       <Skills />
       <Projects />
