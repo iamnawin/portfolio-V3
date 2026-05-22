@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import CursorThemeSetter from "@/components/CursorThemeSetter";
 
+type ProfileTrack = "professional" | "ai";
+
 // ── useInView hook ──────────────────────────────────────────
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -400,21 +402,21 @@ function About() {
 }
 
 // ── Experience ─────────────────────────────────────────────
-function ProfilePaths() {
+function ProfilePaths({ selected, onSelect }: { selected: ProfileTrack | null; onSelect: (track: ProfileTrack) => void }) {
   const paths = [
     {
+      track: "professional" as const,
       eyebrow: "HIRE / COLLABORATE",
       title: "Professional Work",
       desc: "Experience, Salesforce delivery, architecture work, certifications, and enterprise projects.",
-      href: "#experience",
       color: "#3b82f6",
       bg: "rgba(59,130,246,0.05)",
     },
     {
+      track: "ai" as const,
       eyebrow: "BUILD / EXPLORE",
       title: "AI Apps & Experiments",
       desc: "Personal AI products, shipped tools, SaaS experiments, and the 100 ideas filter.",
-      href: "#ai-projects",
       color: "#a855f7",
       bg: "rgba(168,85,247,0.05)",
     },
@@ -433,24 +435,31 @@ function ProfilePaths() {
             Two Ways In.
           </h2>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 15, lineHeight: 1.8, color: "rgba(148,163,184,0.6)", maxWidth: 620, marginBottom: 36 }}>
-            If you are reviewing me for a role, start with the professional track. If you want to see what I am building with AI, jump straight into the apps and experiments.
+            Pick one track. The detailed sections stay hidden until you choose, so recruiters and builders land on the right story without scrolling through everything.
           </p>
         </FadeIn>
 
         <div className="grid md:grid-cols-2 gap-5">
           {paths.map((path, i) => (
             <FadeIn key={path.title} delay={0.1 + i * 0.1} direction={i === 0 ? "left" : "right"}>
-              <a
-                href={path.href}
-                className="group block h-full rounded-xl p-7 transition-all duration-300 hover:-translate-y-1"
-                style={{ background: path.bg, border: `1px solid ${path.color}22`, textDecoration: "none" }}
+              <button
+                type="button"
+                onClick={() => onSelect(path.track)}
+                className="group block h-full w-full rounded-xl p-7 text-left transition-all duration-300 hover:-translate-y-1"
+                style={{
+                  appearance: "none",
+                  cursor: "pointer",
+                  background: selected === path.track ? `linear-gradient(135deg, ${path.color}1f, ${path.bg})` : path.bg,
+                  border: `1px solid ${selected === path.track ? `${path.color}88` : `${path.color}22`}`,
+                  boxShadow: selected === path.track ? `0 18px 60px ${path.color}18` : "none",
+                }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = `${path.color}66`;
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 18px 60px ${path.color}14`;
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = `${path.color}66`;
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 18px 60px ${path.color}14`;
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor = `${path.color}22`;
-                  (e.currentTarget as HTMLAnchorElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = selected === path.track ? `${path.color}88` : `${path.color}22`;
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = selected === path.track ? `0 18px 60px ${path.color}18` : "none";
                 }}
               >
                 <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.18em", color: `${path.color}cc`, marginBottom: 16 }}>
@@ -470,7 +479,10 @@ function ProfilePaths() {
                 <p style={{ fontFamily: "var(--font-body)", fontSize: 14, lineHeight: 1.75, color: "rgba(148,163,184,0.62)", marginTop: 20, maxWidth: 420 }}>
                   {path.desc}
                 </p>
-              </a>
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, letterSpacing: "0.14em", color: selected === path.track ? path.color : "rgba(148,163,184,0.45)", marginTop: 28 }}>
+                  {selected === path.track ? "SELECTED" : "CLICK TO REVEAL"}
+                </div>
+              </button>
             </FadeIn>
           ))}
         </div>
@@ -1114,19 +1126,38 @@ function Contact() {
 
 // ── Page ───────────────────────────────────────────────────
 export default function ProfessionalPage() {
+  const [selectedTrack, setSelectedTrack] = useState<ProfileTrack | null>(null);
+
+  const chooseTrack = (track: ProfileTrack) => {
+    setSelectedTrack(track);
+    const target = track === "professional" ? "experience" : "ai-projects";
+    setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  };
+
   return (
     <main style={{ background: "#0b1120" }}>
       <CursorThemeSetter />
       <Navbar />
       <Hero />
       <About />
-      <ProfilePaths />
-      <Experience />
-      <Skills />
-      <Projects />
-      <PersonalAIProjects />
-      <Certifications />
-      <Contact />
+      <ProfilePaths selected={selectedTrack} onSelect={chooseTrack} />
+
+      {selectedTrack === "professional" && (
+        <>
+          <Experience />
+          <Skills />
+          <Projects />
+          <Certifications />
+          <Contact />
+        </>
+      )}
+
+      {selectedTrack === "ai" && (
+        <>
+          <PersonalAIProjects />
+          <Contact />
+        </>
+      )}
     </main>
   );
 }
